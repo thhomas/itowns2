@@ -21,13 +21,15 @@ define('Core/Commander/Providers/tileGlobeProvider',[
             'Core/Geographic/Projection',
             'Core/Commander/Providers/WMTS_Provider',
             'Core/Geographic/CoordWMTS',
-            'Core/Math/Ellipsoid'            
+            'Core/Math/Ellipsoid',
+            'Core/Commander/Providers/BatiRGE_Provider',
             ],
              function(
                 Projection,
                 WMTS_Provider,
                 CoordWMTS,
-                Ellipsoid){
+                Ellipsoid,
+                BatiRGE_Provider){
                    
     function tileGlobeProvider(){
         //Constructor
@@ -35,6 +37,11 @@ define('Core/Commander/Providers/tileGlobeProvider',[
        this.projection      = new Projection();
        this.providerWMTS    = new WMTS_Provider();       
        this.ellipsoid       = new Ellipsoid(6378137, 6378137, 6356752.3142451793);
+       this.batiRGE         = new BatiRGE_Provider();
+       this.batiRGE.generateMesh(2.33,48.86,0.005);
+       this.batiRGE.generateMesh(2.33,48.87,0.005);
+       this.batiRGE.generateMesh(2.34,48.86,0.005);
+       this.batiRGE.generateMesh(2.32,48.86,0.005);
        //this.cacheGeometry   = [[]];
                
     }        
