@@ -3,6 +3,22 @@
         precision highp float;
         #endif
 
+        #ifdef USE_LOGDEPTHBUF
+
+                uniform float logDepthBufFC;
+
+                #ifdef USE_LOGDEPTHBUF_EXT
+
+                        //#extension GL_EXT_frag_depth : enable
+                        varying float vFragDepth;
+
+                #endif
+
+        #endif
+
+        uniform int         RTC;
+        uniform mat4        mVPMatRTC;
+
         uniform float alpha;
 
         uniform mat4 mvpp_current_0;
@@ -66,9 +82,9 @@
 
 
         // Distortion
-        float cpps = 1042.178;
-        float lpps = 1020.435;
-        vec2 pps = vec2(cpps,lpps);
+        const float cpps = 1042.178;
+        const float lpps = 1020.435;
+        const vec2 pps = vec2(cpps,lpps);
 
         vec4 color = vec4(0.,0.,0.,0.);	
         vec4 colorbis = vec4(0.,0.,0.,0.);
@@ -98,6 +114,13 @@
 
         void main(void)
         {	
+
+            #if defined(USE_LOGDEPTHBUF) && defined(USE_LOGDEPTHBUF_EXT)
+
+              gl_FragDepthEXT = log2(vFragDepth) * logDepthBufFC * 0.5;
+
+            #endif
+
             bool blending = (blendingOn == 1) && (mobileOn==0);
 
             // FIRSTLY the previous position for nice transition

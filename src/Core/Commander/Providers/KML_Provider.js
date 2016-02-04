@@ -73,9 +73,9 @@ define('Core/Commander/Providers/KML_Provider',[
         var east = -3.4900000000000046;
         var west = -3.4940000000000044;*/
         var north = latitude;
-        var south = latitude + 0.005;
+        var south = latitude;
         var east  = longitude;
-        var west  = longitude + 0.005;
+        var west  = longitude;
         var key = 'j2bfkv9whnqpq04zpzlfz2ge'; 
         var url = 'http://wxs.ign.fr/' + key + '/vecteurtuile3d/BATI3D/' + 'FXX/';
         return this.ioDriverXML.read(urlFile).then(function(result)
@@ -114,7 +114,7 @@ define('Core/Commander/Providers/KML_Provider',[
                     
                 }
                 //Next level : Get the next KMZ actual position's coords
-                else if (url_href[i].toLowerCase().substr( - 4 ) ===  '.kmz' && north < coords[i,1] && south > coords[i,2]  && east < coords[i,3] && west > coords[i,4]){
+                else if (url_href[i].toLowerCase().substr( - 4 ) ===  '.kmz' && north < coords[i,1] && south >= coords[i,2]  && east < coords[i,3] && west >= coords[i,4]){
                     //console.log(window.innerHeight);
                     var url_href_kmz = [];
                     url_href_kmz[i] = url + kml[i].childNodes[0].nodeValue.replace("../../", "");

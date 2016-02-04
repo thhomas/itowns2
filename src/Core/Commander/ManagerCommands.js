@@ -71,17 +71,19 @@ define('Core/Commander/ManagerCommands',
         {                       
             this.providers.push(new tileGlobeProvider(param));
             
-            var latitude  = 48.844975;
-            //var latitude  = 2.34749999999999;
+            var latitude  = 48.85;
+            //var latitude  = 2.34749999999999; 
             
-            var  longitude = 2.385785;
-            
+            var  longitude = 2.334;
+           /* 
             this.providers[0].providerKML.loadKMZ(longitude, latitude).then(function (result){
 
                 
                 this.scene.gfxEngine.scene3D.add(result);
+                console.log(result);
  
             }.bind(this));
+            */
         }
     };
         

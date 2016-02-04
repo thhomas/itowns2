@@ -192,6 +192,9 @@ define ('Renderer/ProjectiveTexturing2',[
             console.log("localImageFiles: ",this.localImageFiles);
             var uniforms5 = {
                 
+                    // ADDED FOR GLOBE
+                    RTC             : { type: "i" , value: 1 },
+                    mVPMatRTC       : { type: "m4", value: new THREE.Matrix4()},
                 
                     //disto_and_max_tab:{type: 'fv1', value: arrAllDistoandMax},
                     intrinsic300: {type:"v4",value:distoAndMax300},
@@ -246,53 +249,53 @@ define ('Renderer/ProjectiveTexturing2',[
 
                     texture0: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'300'+"-")+suffixeImage)  
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'300'+"-")+suffixeImage)  
                     },
                     texture1: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'301'+"-")+suffixeImage)  
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'301'+"-")+suffixeImage)  
                     },
                     texture2: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'302'+"-")+suffixeImage) 
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'302'+"-")+suffixeImage) 
                     },
                     texture3: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'303'+"-")+suffixeImage) 
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'303'+"-")+suffixeImage) 
                     },
                     texture4: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'304'+"-")+suffixeImage) 
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'304'+"-")+suffixeImage) 
                     },
 
                     texture0bis: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'300'+"-")+suffixeImage)  
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'300'+"-")+suffixeImage)  
                     },
                     texture1bis: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'301'+"-")+suffixeImage)  
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'301'+"-")+suffixeImage)  
                     },
                     texture2bis: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'302'+"-")+suffixeImage) 
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'302'+"-")+suffixeImage) 
                     },
                     texture3bis: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'303'+"-")+suffixeImage)
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'303'+"-")+suffixeImage)
                     },
                     texture4bis: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture(urlImage+date+imgUrl.replace(pat,"-"+'304'+"-")+suffixeImage) 
+                            value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'304'+"-")+suffixeImage) 
                     },
                     
                     textureFrontMask: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture("../itowns-sample-data/frontMask3.png")
+                            value: THREE.TextureLoader("../itowns-sample-data/frontMask3.png")
                     },
                     textureBackMask: {
                             type: 't',
-                            value: THREE.ImageUtils.loadTexture("../itowns-sample-data/backMask.png")
+                            value: THREE.TextureLoader("../itowns-sample-data/backMask.png")
                     }
 
             };

@@ -114,10 +114,10 @@ function (THREE,
          // MATRIX TO GO FROM APPLANIX REF TO ITOWNS REF. ***********************
         
                                         
-        var _itownsWay =    new THREE.Matrix4().set( 0, 1, 0, 0,
-                                               0, 0,-1, 0,
-                                               1, 0, 0, 0,
-                                               0, 0, 0, 1 );
+        var _itownsWay =    new THREE.Matrix4().set( 0, -1, 0, 0,   // Change for globe V2
+                                                     0, 0, -1, 0,
+                                                     1, 0, 0, 0,
+                                                     0, 0, 0, 1 );
                                            
         var Photogram_JMM    = new THREE.Matrix4().set( 0, 0,-1, 0,
                                                  -1, 0, 0, 0,
@@ -860,15 +860,15 @@ function (THREE,
 
   
   
-      //  out = new THREE.Matrix4().multiplyMatrices(_itownsWay, this.getMatCam(num).clone());    
+    //  out = new THREE.Matrix4().multiplyMatrices(_itownsWay, this.getMatCam(num).clone());    
         out = this.getMatCam(num).clone();    
         out = new THREE.Matrix4().multiplyMatrices( out.clone(), Photogram_JMM.clone() );
         out = new THREE.Matrix4().multiplyMatrices( out.clone(), this.getMatOrientationCapteur(numOri).clone());
         out = new THREE.Matrix4().multiplyMatrices( out.clone(), photgramme_image.clone());
 
         out = new THREE.Matrix4().multiplyMatrices(_itownsWay, out.clone());    
-
-    //    out = new THREE.Matrix4().multiplyMatrices( out.clone(), rotY180);   // !!!
+        
+        out = new THREE.Matrix4().multiplyMatrices( out.clone(), rotY180);   // !!! added for globe V2
 
      
         

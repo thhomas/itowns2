@@ -3,8 +3,25 @@
     precision  highp float;
     #endif
 
+#ifdef USE_LOGDEPTHBUF
+    
+    #define EPSILON 1e-6
+    #ifdef USE_LOGDEPTHBUF_EXT
+
+        varying float vFragDepth;
+
+    #endif
+
+    uniform float logDepthBufFC;
+
+#endif
+
+
     // Those uniforms are 
     // ModelView * Projection * rotation of the rigid sys (Stereopolis)
+
+    uniform int         RTC;
+    uniform mat4        mVPMatRTC;
 
     uniform mat4 mvpp_current_0;
     uniform mat4 mvpp_current_1;
@@ -64,6 +81,24 @@
         v_texcoord3bis =  mvpp_current_3bis * (pos- factorTranslation3bis);
         v_texcoord4bis =  mvpp_current_4bis * (pos- factorTranslation4bis);
 
-        gl_Position  =  projectionMatrix *  modelViewMatrix * pos;
+        mat4 projModelViewMatrix = (RTC == 0) ? projectionMatrix * modelViewMatrix : mVPMatRTC;
+        gl_Position  =  projModelViewMatrix * pos;
+        //gl_Position  =  projectionMatrix *  modelViewMatrix * pos;
+
+        #ifdef USE_LOGDEPTHBUF
+
+            gl_Position.z = log2(max( EPSILON, gl_Position.w + 1.0 )) * logDepthBufFC;
+            
+            #ifdef USE_LOGDEPTHBUF_EXT
+
+                vFragDepth = 1.0 + gl_Position.w;
+
+            #else
+
+                gl_Position.z = (gl_Position.z - 1.0) * gl_Position.w;
+
+            #endif
+
+        #endif
 
     }

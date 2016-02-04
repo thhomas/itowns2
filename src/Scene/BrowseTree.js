@@ -75,7 +75,8 @@ define('Scene/BrowseTree',['THREE','Globe/EllipsoidTileMesh','Scene/NodeProcess'
                         node.setChildrenVisibility(false);
                         
                         return false;                            
-                    }                                
+                    }         
+                    
                 }
             }
 
@@ -104,7 +105,8 @@ define('Scene/BrowseTree',['THREE','Globe/EllipsoidTileMesh','Scene/NodeProcess'
         
         node.setFog(this.fogDistance);        
     };
-        
+      
+
     BrowseTree.prototype.getRTCMatrix = function(center,camera)    
     {               
         // TODO gerer orientation et echelle de l'objet
