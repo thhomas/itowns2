@@ -11,6 +11,9 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe',['Core/Commander/Interf
         //Constructor
 
         this.commandsTree = null;
+        this.viewerDiv = null;
+        this.initialCenter = null;
+        this.initialCamera = null;
 
     };        
 
@@ -40,13 +43,19 @@ define('Core/Commander/Interfaces/ApiInterface/ApiGlobe',['Core/Commander/Interf
 
     };
     
-    ApiGlobe.CreateSceneGlobe = function(){
+    ApiGlobe.CreateSceneGlobe = function(initCenter){
     //TODO: Normalement la création de scene ne doit pas etre ici....
     // à deplacer plus tard
-    
+
+        if (initCenter) {
+            this.initialCenter = {lon: initCenter.lon, lat: initCenter.lat, alt: initCenter.alt};
+        } else {
+            this.initialCenter = {lon: 2, lat: 45, alt: 10000000};
+        }
+
         var scene = Scene();
       
-        scene.init();
+        scene.init(this.initialCenter);
     
         return scene;
 

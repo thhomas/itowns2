@@ -24,8 +24,13 @@ and open the template in the editor.
     <body>
         <script type="text/javascript">
             require(['src/Main'], function() {
+                var initCenter = {
+                    lon: 3,
+                    lat: 45,
+                    alt: 2000000
+                }
                 // iTowns namespace defined here
-                iTowns.viewer.CreateSceneGlobe() ;
+                iTowns.viewer.CreateSceneGlobe(initCenter) ;
             });
         </script>
     </body>
