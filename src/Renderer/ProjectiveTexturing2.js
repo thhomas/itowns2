@@ -193,7 +193,7 @@ define ('Renderer/ProjectiveTexturing2',[
             var uniforms5 = {
                 
                     // ADDED FOR GLOBE
-                    RTC             : { type: "i" , value: 1 },
+                    RTC             : { type: "i" , value: 0 },
                     mVPMatRTC       : { type: "m4", value: new THREE.Matrix4()},
                 
                     //disto_and_max_tab:{type: 'fv1', value: arrAllDistoandMax},

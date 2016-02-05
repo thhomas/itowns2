@@ -107,11 +107,11 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
             var url = "../itowns-sample-data/image200.json";//this.url(URLServiceOrientedImages,position);     
 
 
-          //  var texture = this.getTexture(0).then(){};  // URL is urlImages (hardcoded for now)
-         //   var texture = THREE.ImageUtils.loadTexture( this.urlImages());
+                     //  var texture = this.getTexture(0).then(){};  // URL is urlImages (hardcoded for now)
+                     //   var texture = THREE.ImageUtils.loadTexture( this.urlImages());
             var geometrySphere = new THREE.SphereGeometry( 10000000, 16, 16 );
-          //  var geometry = geom;   
-         //   var material = new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture} ); 
+                    //  var geometry = geom;   
+                    //   var material = new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture} ); 
 
             // POS
             var ellipsoid  = new Ellipsoid(new THREE.Vector3(6378137, 6356752.3142451793, 6378137));
@@ -125,7 +125,7 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
                 pan_xml_heading_pp:176.117188,pan_xml_roll_pp:0.126007,pan_xml_pitch_pp:1.280821,
                 pan_time_utc:"12:31:34.84099999998463"};
             
-            // Lon lat p = 2,3348138   48,8506030
+             // Lon lat p = 2,3348138   48,8506030
              // POS in 3D scene of the panoramic
              var posCarto = new CoordCarto().setFromDegreeGeo(48.8506030,2.3348138, 49.39);
              var posCartesien = ellipsoid.cartographicToCartesian(posCarto);
@@ -190,17 +190,21 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
          //   mesh.position.set(pos.x, pos.y, pos.z);
             gfxEngine().add3DScene(mesh);
             
+            ProjectiveTexturing2.uniforms.RTC = 0;
             
       console.log("ooooooooooooooo");
-      
+/*                  
          // RTC computation
          //node.material.setMatrixRTC(this.browserScene.getRTCMatrix(node.position,this.currentCamera()));
          var camera = gfxEngine().camera.camera3D;
          var matRTC = BrowseTree.getRTCMatrix(position, camera);
          console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",matRTC);
-         projectiveMaterial.uniform.matRTC = matRTC;
-      
+         projectiveMaterial.uniforms.RTC = 1;
+         projectiveMaterial.uniforms.matRTC = matRTC;
+  */   
             // Suppose we got the metadata and image
+
+
 
          /*
             return new Promise(function(resolve, reject) {
