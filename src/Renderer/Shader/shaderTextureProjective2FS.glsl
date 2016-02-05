@@ -295,6 +295,6 @@
             }
 
             color.a = alpha;
-            gl_FragColor = color;
+            gl_FragColor = color;  //vec4(0.,1.,0.,1.);
 
     }

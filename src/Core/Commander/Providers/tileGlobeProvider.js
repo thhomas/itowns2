@@ -49,13 +49,13 @@ define('Core/Commander/Providers/tileGlobeProvider',[
        this.providerWMTS    = new WMTS_Provider();
        this.ellipsoid       = new Ellipsoid(size);       
        this.providerKML     = new KML_Provider(this.ellipsoid);
-       this.providerOrientedImages = new OrientedImages_Provider();
+   //    this.providerOrientedImages = new OrientedImages_Provider();
        this.cacheGeometry   = [];
        this.tree            = null;
        this.nNode           = 0;
        
        // Test ImageOriented
-       this.providerOrientedImages.getOrientedImageMetaData("aaa",{});
+   //    this.providerOrientedImages.getOrientedImageMetaData("aaa",{});
                
     }        
 

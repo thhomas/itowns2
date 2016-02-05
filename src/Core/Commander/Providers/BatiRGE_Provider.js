@@ -49,9 +49,8 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
 
     }
 
-    BatiRGE_Provider.prototype = Object.create( Provider.prototype );
-
-    BatiRGE_Provider.prototype.constructor = BatiRGE_Provider;
+//    BatiRGE_Provider.prototype = Object.create( Provider.prototype );
+//   BatiRGE_Provider.prototype.constructor = BatiRGE_Provider;
     
     
     /**
@@ -84,13 +83,15 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
 
   
     // 2.33 48.86
-    BatiRGE_Provider.prototype.generateMesh = function(longitude,latitude,radius)
+    // return {geometry:_geometry, pivot: undefined}
+    BatiRGE_Provider.prototype.generateMesh = function(longitude,latitude,radius, pivotOn)
     {
        console.log("GERENTE MESH");
        var url = this.url(longitude,latitude,radius);                    
        // var dataCache = this.cache.getRessource(url);
        
        var deferred = when.defer();  
+       
        
        function createElements(elements) {
            
@@ -243,7 +244,20 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
         */   
        //     gfxEngine().add3DScene(_currentMeshForClickAndGo);
 
-            deferred.resolve(_geometry);
+
+
+
+           // Test if we return brute geometry or if we use local pivot (for RTC)
+           if(pivotOn){
+               
+                 var firstPos = _geometry.vertices[0].clone();  // create pivot from 1st pos vertex
+                 for(var i = 0; i< _geometry.vertices.length ; ++i){
+                        _geometry.vertices[i].sub(firstPos);
+                 }
+                deferred.resolve({geometry:_geometry, pivot: firstPos});
+           }
+           
+            deferred.resolve({geometry:_geometry, pivot: undefined});
         }
 
         var request = new XMLHttpRequest();

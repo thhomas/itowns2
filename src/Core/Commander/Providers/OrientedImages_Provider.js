@@ -34,20 +34,20 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
                 CacheRessource,
                 ProjectiveTexturing2){
 
-
+                
     function OrientedImages_Provider()
     {
         //Constructor
  
-        Provider.call(this, new IoDriver_Image()); // Should be JSON
+     //   Provider.call(this, new IoDriver_Image()); // Should be JSON
      //   this.cache         = CacheRessource();        
         this.ioDriverImage = new IoDriver_Image();
         this.ioDriverXML = new IoDriverXML();
        
     }
 
-    OrientedImages_Provider.prototype = Object.create( Provider.prototype );
-    OrientedImages_Provider.prototype.constructor = OrientedImages_Provider;
+//    OrientedImages_Provider.prototype = Object.create( Provider.prototype );
+//    OrientedImages_Provider.prototype.constructor = OrientedImages_Provider;
     
   
     /**
@@ -80,8 +80,28 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
         
     };
         
+    /*
+   OrientedImages_Provider.prototype.initOri = function(){
+
+        Ori.init();
+        OrientedImages_Provider.prototype.testInitOri();
+   };     
         
         
+    OrientedImages_Provider.prototype.testInitOri = function() {
+        
+        console.log("testinitOri");
+        
+        if (Ori.initiated){ console.log("init ori ok");
+             OrientedImages_Provider.prototype.getOrientedImageMetaData();
+        }
+        else {
+             setTimeout(OrientedImages_Provider.prototype.testInitOri, 300);  // !! scope
+        }
+        
+    };
+        
+        */
     /**
      * return texture of the oriented image
      * @param {type} coWMTS : coord WMTS
@@ -89,37 +109,31 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
      */
     OrientedImages_Provider.prototype.getOrientedImageMetaData = function(URLServiceOrientedImages, position)
     {
-        
+        Ori.init();
         console.log("getOrientedImageMetaData");
         var batiRGE         = new BatiRGE_Provider();
-        Ori.init();
-         
-        batiRGE.generateMesh(2.3348138,48.8506030,0.002).then(function(geom){
+        var RTC_ON = true;
+        
+        batiRGE.generateMesh(2.3348138,48.8506030,0.0025, RTC_ON).then(function(geometry){
             
-            
-           
-           console.log("geom",geom);
-
+ 
+            var geom = geometry.geometry;
+            console.log("geom",geom);
 
             if(URLServiceOrientedImages === undefined)
                 return when(-2);
 
             var url = "../itowns-sample-data/image200.json";//this.url(URLServiceOrientedImages,position);     
-
-
                      //  var texture = this.getTexture(0).then(){};  // URL is urlImages (hardcoded for now)
                      //   var texture = THREE.ImageUtils.loadTexture( this.urlImages());
             var geometrySphere = new THREE.SphereGeometry( 10000000, 16, 16 );
                     //  var geometry = geom;   
                     //   var material = new THREE.MeshBasicMaterial( {side: THREE.DoubleSide, map: texture} ); 
-
             // POS
             var ellipsoid  = new Ellipsoid(new THREE.Vector3(6378137, 6356752.3142451793, 6378137));
             var pos = ellipsoid.cartographicToCartesian(new CoordCarto().setFromDegreeGeo(48.85,2.334, 100));
 
-
             // Test projective texturing    paris 6: 2.334 48.85
-
             var p = {filename:"Paris-140616_0740-00-00001_0000482",
                 easting:651187.76,northing:6861379.05,altitude:39.39,
                 pan_xml_heading_pp:176.117188,pan_xml_roll_pp:0.126007,pan_xml_pitch_pp:1.280821,
@@ -135,8 +149,6 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
              console.log(posCartesien);
              gfxEngine().add3DScene(spherePosPano);
              
-            
-            
              var matRotation = new THREE.Matrix4();
              matRotation = Ori.computeMatOriFromHeadingPitchRoll(
                                         p.pan_xml_heading_pp,
@@ -147,40 +159,43 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
          
         
             // Then we need to set the rotation with the normal at the center of the pano
-    
-            
             // Orientation on normal    
-                var normal      = ellipsoid.geodeticSurfaceNormalCartographic(posCarto);
-                var quaternion  = new THREE.Quaternion();
-                quaternion.setFromAxisAngle( new THREE.Vector3(1, 0 ,0 ),0);// Math.PI/2 );
-                   
-                var child = new THREE.Object3D();
-                child.lookAt(new THREE.Vector3().addVectors ( posCartesien.clone(), normal ));
-                child.quaternion.multiply(quaternion );                
-                //child.position.copy(posCartesien.clone());
-                child.updateMatrix();
-                
-                console.log(gfxEngine().camera.camera3D);
+            var normal      = ellipsoid.geodeticSurfaceNormalCartographic(posCarto);
+            var quaternion  = new THREE.Quaternion();
+            quaternion.setFromAxisAngle( new THREE.Vector3(1, 0 ,0 ),0);// Math.PI/2 );
+
+            var child = new THREE.Object3D();
+            child.lookAt(new THREE.Vector3().addVectors ( posCartesien.clone(), normal ));
+            child.quaternion.multiply(quaternion );                
+            //child.position.copy(posCartesien.clone());
+            child.updateMatrix();
+
+           // console.log(gfxEngine().camera.camera3D);
            //     gfxEngine().camera.camera3D.position.set( posCartesien.x ,posCartesien.y, posCartesien.z); 
-               
-                
-                var matRotationGlobe = new THREE.Matrix4().multiplyMatrices(matRotation.clone(),child.matrix);
-                matRotation = matRotationGlobe;
+            var matRotationGlobe = new THREE.Matrix4().multiplyMatrices(matRotation.clone(),child.matrix);
+            matRotation = matRotationGlobe;
+                            
+                            
                             
             var position = new THREE.Vector4(posCartesien.x, posCartesien.y, posCartesien.z, 1);//new THREE.Vector4(0,0,0,1);
-            ProjectiveTexturing2.init(matRotation);
             
+            var positionCamWithPivot = RTC_ON  ? new THREE.Vector4(position.clone().sub(geometry.pivot),1.) : position;
+            ProjectiveTexturing2.init(matRotation);
+
             var projectiveMaterial = ProjectiveTexturing2.createShaderForImage(p.filename/*this.panoInfo.filename*/,50);
-            ProjectiveTexturing2.changePanoTextureAfterloading("140616/"+p.filename,512,50,position, matRotation,1);
+            //ProjectiveTexturing2.changePanoTextureAfterloading("140616/"+p.filename,512,50,position, matRotation,1);
+            ProjectiveTexturing2.changePanoTextureAfterloading("140616/"+p.filename,512,50,positionCamWithPivot, matRotation,1);
             
             var mat = new THREE.MeshBasicMaterial({color:0xff00ff});
-          //  var mesh  = new THREE.Mesh(geometry,mat);
+                        //  var mesh  = new THREE.Mesh(geometry,mat);
             var mesh  = new THREE.Mesh(geom,mat);//geometrySphere/*geom*/,mat);
-       //     mat.side = THREE.DoubleSide;
+                            //     mat.side = THREE.DoubleSide;
             mesh.name = "RGE";
             mesh.material = projectiveMaterial;
-         //   mesh.material.side = THREE.DoubleSide;  
-        //  mesh.material.transparent = true;
+            mesh.material.transparent = false;
+            
+            if(RTC_ON )   // RTC ON
+                mesh.position.set(geometry.pivot.x, geometry.pivot.y, geometry.pivot.z);
 
        
             var matLambert = new THREE.MeshLambertMaterial({color: 0xff0000, side: 2,  transparent: true, opacity: 0.9});
@@ -188,23 +203,30 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
         //    gfxEngine().add3DScene(_currentMeshForClickAndGo );
        
          //   mesh.position.set(pos.x, pos.y, pos.z);
+            
+            
+          
+            
             gfxEngine().add3DScene(mesh);
             
-            ProjectiveTexturing2.uniforms.RTC = 0;
+           // mesh.material.uniforms.RTC.value = 0;
+            //  mesh.material.uniforms.value.RTC.needsUpdate = true;
             
-      console.log("ooooooooooooooo");
-/*                  
+          
          // RTC computation
-         //node.material.setMatrixRTC(this.browserScene.getRTCMatrix(node.position,this.currentCamera()));
-         var camera = gfxEngine().camera.camera3D;
-         var matRTC = BrowseTree.getRTCMatrix(position, camera);
-         console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",matRTC);
-         projectiveMaterial.uniforms.RTC = 1;
-         projectiveMaterial.uniforms.matRTC = matRTC;
-  */   
+         // node.material.setMatrixRTC(this.browserScene.getRTCMatrix(node.position,this.currentCamera()));
+         if(RTC_ON ){
+             
+             mesh.material.uniforms.RTC.value = 1;
+             OrientedImages_Provider.computeRTC2(geometry.pivot, gfxEngine().camera, mesh );
+
+        }
+        
+        
+     
+     
+     
             // Suppose we got the metadata and image
-
-
 
          /*
             return new Promise(function(resolve, reject) {
@@ -263,6 +285,36 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
     };
     
     
+        // Super dirty (temp for local test)
+    OrientedImages_Provider.computeRTC2 = function(center, camera, mesh){
+
+             var position    = new THREE.Vector3().subVectors(camera.camera3D.position,center);
+             var quaternion  = new THREE.Quaternion().copy(camera.camera3D.quaternion);        
+             var matrix      = new THREE.Matrix4().compose(position,quaternion,new THREE.Vector3(1,1,1));
+             var matrixInv   = new THREE.Matrix4().getInverse(matrix);       
+             var centerEye   = new THREE.Vector4().applyMatrix4(matrixInv) ;                        
+             var mvc         = matrixInv.setPosition(centerEye);      
+             var matRTC      = new THREE.Matrix4().multiplyMatrices(camera.camera3D.projectionMatrix,mvc);
+             mesh.material.uniforms.mVPMatRTC.value = matRTC;
+ 
+             setTimeout(function(){OrientedImages_Provider.computeRTC2(center, camera, mesh);}, 6);//1000/60); //OrientedImages_Provider.computeRTC2(center, camera, mesh)
+    };
+
+
+
+    OrientedImages_Provider.computeRTC = function(center, camera){
+        
+        
+        console.log("computeRTC");
+            // TODO gerer orientation et echelle de l'objet
+        var position    = new THREE.Vector3().subVectors(camera.camera3D.position,center);
+        var quaternion  = new THREE.Quaternion().copy(camera.camera3D.quaternion);        
+        var matrix      = new THREE.Matrix4().compose(position,quaternion,new THREE.Vector3(1,1,1));
+        var matrixInv   = new THREE.Matrix4().getInverse(matrix);       
+        var centerEye   = new THREE.Vector4().applyMatrix4(matrixInv) ;                        
+        var mvc         = matrixInv.setPosition(centerEye);      
+        return            new THREE.Matrix4().multiplyMatrices(camera.camera3D.projectionMatrix,mvc);
+    }
 
     /**
      * Return texture RGBA THREE.js of orthophoto

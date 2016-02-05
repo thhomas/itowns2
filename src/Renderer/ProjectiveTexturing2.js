@@ -67,7 +67,7 @@ define ('Renderer/ProjectiveTexturing2',[
         var ProjectiveTexturing2 = {
          
             imgName:'',
-            nbL2Loaded : 0,     // Indicate the number of image loaded at level2 
+            nbL2Loaded : 0,  // Indicate the number of image loaded at level2 
                              // If 10 then we can load level 3
                              // This technic allow to not load level 3 when navigating fast
                           
@@ -378,7 +378,7 @@ define ('Renderer/ProjectiveTexturing2',[
                 
                 _shaderMat.uniforms[nameTexture+'bis'].value = new THREE.Texture(this,THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.LinearFilter,THREE.LinearFilter,THREE.RGBFormat);
                 _shaderMat.uniforms[nameTexture+'bis'].value.needsUpdate = true;
-                if(nbLevel==1 && !that.localImageFiles) that.changeQuality(imgName,nameTexture,num,512,qlt,numImg);  // Load level 2
+             //   if(nbLevel==1 && !that.localImageFiles) that.changeQuality(imgName,nameTexture,num,512,qlt,numImg);  // Load level 2
               //  if(that.localImageFiles) graphicEngine.setSpeedTurnCam(0.1);
             }; 
 

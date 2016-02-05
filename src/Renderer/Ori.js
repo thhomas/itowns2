@@ -12,8 +12,8 @@ define ('Renderer/Ori',[
     'Renderer/Utils',
     'Renderer/Sensor'],
 function (THREE,
-        Utils,
-        Sensor) {
+          Utils,
+          Sensor) {
 
     // Extrinseque Parameters
      var _MatCam21,   // Orientation matrices for camera, relatif
@@ -141,21 +141,23 @@ function (THREE,
                  
           init: function(){
               
+                console.log("Initialization of ori");
                // NOT YET FULLY USED!
-               this.getAllSensorsInfosDBForChantier(1);  // We get info for all sensors from DB
+          //     this.getAllSensorsInfosDBForChantier(1);  // We get info for all sensors from DB
               
                this.getAllMobileMatrices();  // From mobile file
                this.setAllMobileMatricesToItownsRef(); // To itownsREF
                
                this.getAllMobileSommet();    // From mobile file
                this.setAllMobileSommetToItownsRef(); // To itownsREF
-               
+
           },
           
           
           // We get info for all sensors from DB
           getAllSensorsInfosDBForChantier: function(idChantier){
 
+            console.log("getAllSensorsInfosDBForChantier");
                 var that = this;
                 /*
                 $.getJSON(PanoramicProvider.getMetaDataSensorURL(idChantier), function (data){
@@ -163,18 +165,22 @@ function (THREE,
                 });
                 */
                
+              
                 var requestURL = "../itowns-sample-data/cameraCalibration.json";    
                 var req = new XMLHttpRequest();
-                     req.open('GET', requestURL);
+                 
+                 req.open('GET', requestURL,true);
+                 
+                 req.onreadystatechange = function() {
 
-                      req.onload = function() {
+                        if (req.readyState == 4 && req.status == 200){
 
-                            if (req.status === 200) {
-                                
-                                var data = JSON.parse(req.response);
-                                handleDBData(data);
-                            }                   
-                      };                          
+                            var data = JSON.parse(req.response);
+                            that.handleDBData(data);
+                        }      
+                  };    
+
+                  req.send(null);  
            },
 
 
@@ -186,7 +192,6 @@ function (THREE,
 
                 arrayCam = data;
                 for (var i =0; i< data.length; ++i){  // For all DB sens info we create sensor object
-                    
                     var s = new Sensor(arrayCam[i]);
                     s.setMatrix(); //Utils.outputMatrix4(s.mat3d);
                     s.setSommet();

@@ -272,6 +272,7 @@ define('Renderer/c3DEngine',[
      
     c3DEngine.prototype.enableRTC = function(enable)
     {
+        
          for (var x = 0; x < this.scene3D.children.length; x++)
          {
              var node = this.scene3D.children[x];
