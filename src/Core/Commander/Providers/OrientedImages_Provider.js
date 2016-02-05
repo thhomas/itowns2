@@ -33,6 +33,10 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
                 Ori,
                 CacheRessource,
                 ProjectiveTexturing2){
+                    
+                    
+                   var  _projectiveMaterial = null,
+                        _mesh = null;
 
                 
     function OrientedImages_Provider()
@@ -182,20 +186,22 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
             var positionCamWithPivot = RTC_ON  ? new THREE.Vector4(position.clone().sub(geometry.pivot),1.) : position;
             ProjectiveTexturing2.init(matRotation);
 
-            var projectiveMaterial = ProjectiveTexturing2.createShaderForImage(p.filename/*this.panoInfo.filename*/,50);
+            _projectiveMaterial = ProjectiveTexturing2.createShaderForImage(p.filename/*this.panoInfo.filename*/,50);
             //ProjectiveTexturing2.changePanoTextureAfterloading("140616/"+p.filename,512,50,position, matRotation,1);
             ProjectiveTexturing2.changePanoTextureAfterloading("140616/"+p.filename,512,50,positionCamWithPivot, matRotation,1);
             
             var mat = new THREE.MeshBasicMaterial({color:0xff00ff});
                         //  var mesh  = new THREE.Mesh(geometry,mat);
-            var mesh  = new THREE.Mesh(geom,mat);//geometrySphere/*geom*/,mat);
+            _mesh  = new THREE.Mesh(geom,mat);//geometrySphere/*geom*/,mat);
                             //     mat.side = THREE.DoubleSide;
-            mesh.name = "RGE";
-            mesh.material = projectiveMaterial;
-            mesh.material.transparent = false;
+            _mesh.name = "RGE";
+            _mesh.material = _projectiveMaterial;
+            _mesh.material.transparent = false;
+            _mesh.material.side = THREE.DoubleSide;  
+            _mesh.visible = true;  
             
             if(RTC_ON )   // RTC ON
-                mesh.position.set(geometry.pivot.x, geometry.pivot.y, geometry.pivot.z);
+                _mesh.position.set(geometry.pivot.x, geometry.pivot.y, geometry.pivot.z);
 
        
             var matLambert = new THREE.MeshLambertMaterial({color: 0xff0000, side: 2,  transparent: true, opacity: 0.9});
@@ -207,7 +213,7 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
             
           
             
-            gfxEngine().add3DScene(mesh);
+            gfxEngine().add3DScene(_mesh);
             
            // mesh.material.uniforms.RTC.value = 0;
             //  mesh.material.uniforms.value.RTC.needsUpdate = true;
@@ -217,8 +223,8 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
          // node.material.setMatrixRTC(this.browserScene.getRTCMatrix(node.position,this.currentCamera()));
          if(RTC_ON ){
              
-             mesh.material.uniforms.RTC.value = 1;
-             OrientedImages_Provider.computeRTC2(geometry.pivot, gfxEngine().camera, mesh );
+             _mesh.material.uniforms.RTC.value = 1;
+             OrientedImages_Provider.computeRTC2(geometry.pivot, gfxEngine().camera, _mesh );
 
         }
         
