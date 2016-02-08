@@ -449,11 +449,9 @@ THREE.GlobeControls = function ( object, domElement,engine ) {
                 this.localPhi += phiDelta;
                 this.localTheta += thetaDelta;
                 
-                // Get targetposition on same plane as camera
                 var cameraPos = this.object.position;
-             //   console.log(this.object.up);
-                
-                var normal = new THREE.Vector3(-0.6574784037672624, 0.7529963626299029, 0.026807208839949137);
+      
+                var normal = cameraPos.clone().normalize();
                 var quaternion  = new THREE.Quaternion();
                 quaternion.setFromAxisAngle( new THREE.Vector3(1, 0 ,0 ), Math.PI/2 );
 
@@ -461,75 +459,23 @@ THREE.GlobeControls = function ( object, domElement,engine ) {
                 var localTarget = new THREE.Vector3().addVectors ( cameraPos.clone(), normal );
                 child.lookAt(localTarget);
                 child.quaternion.multiply(quaternion );                
-                //child.position.copy(posCartesien.clone());
                 child.updateMatrix();
+
+                var quaternionTHETA = new THREE.Quaternion();
+                quaternionTHETA.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), this.localTheta );
+                child.quaternion.multiply(quaternionTHETA);
                 
-                /*
-                this.object.quaternion = child.quaternion;
-                this.object.updateMatrix();
-                this.object.updateMatrixWorld(true);
-                this.object.matrixWorldInverse.getInverse(this.object.matrixWorld);     
-                */
-          //      this.object.matrix = child.matrix;
-      
-               
                 var quaternionPHI = new THREE.Quaternion();
-                quaternionPHI.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), this.localTheta );
+                quaternionPHI.setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), this.localPhi );
                 child.quaternion.multiply(quaternionPHI);
-                
-                
-       /*         this.object.useQuaternion = true;
-                this.object.quaternion = child.quaternion;
-                
-                this.object.updateMatrixWorld();
-         */       
-             //   console.log(child.quaternion);
-            //    console.log(this.object.quaternion);
-                //    this.object.up.set(1,0,1);
-                //     this.object.lookAt( this.globeTargetX);
-                 
+  
                 var rotationALL = new THREE.Euler().setFromQuaternion( child.quaternion);//, eulerOrder ); 
                 
                 this.object.rotation.set(rotationALL.x,rotationALL.y,rotationALL.z);
-               
-             //  console.log(rotationALL);
-                this.localPhi += phiDelta;
-                this.localTheta += thetaDelta;
-           //     console.log(this.localPhi);
                 
-                
-                this.object.matrix.setRotationFromQuaternion(child.quaternion);
-		this.object.matrixAutoUpdate = false;
-                this.object.updateMatrix();
-                
-                
-              //  this.object.rotation.x = this.localPhi;
-              //  this.object.rotation.y = this.localTheta ;
-                
-              /*  
-                //  this.rot(offGT,1);
-                var point = offGT.clone();
-                console.log(thetaDelta, " ",phiDelta);
-                theta = Math.atan2( point.x, point.z );
-                // angle from y-axis
-                phi = Math.atan2( Math.sqrt( point.x * point.x + point.z * point.z ), point.y );
-                
-                theta += thetaDelta;
-                phi += phiDelta;
-                
-                var radius = 10000;
-                point.x = radius * Math.sin( phi ) * Math.sin( theta );
-                point.y = radius * Math.cos( phi );
-                point.z = radius * Math.sin( phi ) * Math.cos( theta );
-             
-                this.globeTarget.position.set( point.x,  point.y, point.z);
-                
-                console.log(this.getPolarAngle());
-             */
             }else
                  this.object.lookAt( offGT );   // Usual CASE (not rotating around camera axe)
-            
-            //console.log("this.globeTarget pos", this.globeTarget.position);
+
             thetaDelta = 0;
             phiDelta = 0;
             scale = 1;
