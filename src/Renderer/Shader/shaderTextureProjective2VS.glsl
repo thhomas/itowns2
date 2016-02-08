@@ -85,6 +85,7 @@
         gl_Position  =  projModelViewMatrix * pos;
         //gl_Position  =  projectionMatrix *  modelViewMatrix * pos;
 
+
         #ifdef USE_LOGDEPTHBUF
 
             gl_Position.z = log2(max( EPSILON, gl_Position.w + 1.0 )) * logDepthBufFC;

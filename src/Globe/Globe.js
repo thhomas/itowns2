@@ -33,10 +33,20 @@ define('Globe/Globe',[
         this.atmosphere = this.NOIE ? new Atmosphere(this.size) : undefined;
         
         this.batiments  = new Layer();
-      // Dirty immersiveTest  
-        this.immersiveLayer = new Layer();
-        this.providerOrientedImages = new OrientedImages_Provider();
-        this.providerOrientedImages.getOrientedImageMetaData("aaa",{});
+        
+        
+        window.onkeypress = function(event) {
+            
+            
+            if(this.immersiveLayer === undefined)
+               // Dirty immersiveTest  
+                 this.immersiveLayer = new Layer();
+                 this.providerOrientedImages = new OrientedImages_Provider();
+                 this.providerOrientedImages.getOrientedImageMetaData("aaa",{});
+
+        }.bind(this);
+   
+
         
         var material    = new BasicMaterial(new THREE.Color(1,0,0));
         var geometry    = new THREE.SphereGeometry(200);       

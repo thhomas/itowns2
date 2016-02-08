@@ -8,6 +8,7 @@ define('Renderer/c3DEngine',[
     'THREE',
     'OrbitControls',
     'GlobeControls',
+    'PointerLockControls',
     'Renderer/Camera',
     'Globe/Atmosphere',
     'Renderer/DepthMaterial',
@@ -15,6 +16,7 @@ define('Renderer/c3DEngine',[
         THREE,
         OrbitControls,
         GlobeControls,
+        PointerLockControls,
         Camera,
         Atmosphere,
         DepthMaterial,
@@ -334,7 +336,8 @@ define('Renderer/c3DEngine',[
 
     c3DEngine.prototype.initControls = function(size){
         
-        //this.controls   = new THREE.OrbitControls( this.camera.camera3D,this.renderer.domElement );        
+        //this.controls   = new THREE.PointerLockControls(this.camera.camera3D);//, this.renderer.domElement);    
+        //this.scene3D.add( this.controls.getObject() );    
         this.controls   = new THREE.GlobeControls( this.camera.camera3D,this.renderer.domElement,this );
         
         this.controls.target        = new THREE.Vector3(0,0,0);
@@ -351,6 +354,7 @@ define('Renderer/c3DEngine',[
         //this.controls.keyPanSpeed   = 1.0;
         this.controls.keyPanSpeed   = 0.01;
         this.controls.update();
+        
     };
     
     /**

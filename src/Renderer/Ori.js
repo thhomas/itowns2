@@ -240,7 +240,7 @@ function (THREE,
           computeMatOriFromHeadingPitchRoll: function(heading,pitch,roll){
               
               //  console.log(heading,pitch,roll);
-                heading = parseFloat(heading) / 180 * Math.PI;  // Deg to Rad // Axe Y
+                heading = (180 - parseFloat(heading) ) / 180 * Math.PI;  // Deg to Rad // Axe Y   // ADDED 180 - heading FOR GLOBE V2
                 pitch = parseFloat(pitch)/ 180 * Math.PI;  // Deg to Rad // axe X
                 roll = parseFloat(roll)/ 180 * Math.PI;  // Deg to Rad   // axe Z
         /*        var matRotationHead  = new THREE.Matrix4(); 
@@ -873,7 +873,7 @@ function (THREE,
 
         out = new THREE.Matrix4().multiplyMatrices(_itownsWay, out.clone());    
         
-        out = new THREE.Matrix4().multiplyMatrices( out.clone(), rotY180);   // !!! added for globe V2
+  //      out = new THREE.Matrix4().multiplyMatrices( out.clone(), rotY180);   // !!! added for globe V2
 
      
         

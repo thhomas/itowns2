@@ -19,6 +19,7 @@ requirejs.config({
         'parallel'      : 'ThirdParty/parallel',        
         'OrbitControls' : "Renderer/Three/OrbitControls",
         'GlobeControls' : "Renderer/ThreeExtented/GlobeControls",
+        'PointerLockControls': "Renderer/Three/PointerLockControls",
         'FlyControls'   : "Renderer/Three/FlyControls",
         'FontUtils'     : "Renderer/Three/FontUtils",
         'FontOptimer'   : "Renderer/Three/optimer_regular",
@@ -60,6 +61,9 @@ requirejs.config({
             deps: ['THREE']
         },   
         FlyControls: {
+            deps: ['THREE']
+        },
+        PointerLockControls: {
             deps: ['THREE']
         },
         FontUtils: {

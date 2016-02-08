@@ -289,6 +289,7 @@ define ('Renderer/ProjectiveTexturing2',[
                             value: THREE.TextureLoader(urlImage+date+imgUrl.replace(pat,"-"+'304'+"-")+suffixeImage) 
                     },
                     
+                    /*
                     textureFrontMask: {
                             type: 't',
                             value: THREE.TextureLoader("../itowns-sample-data/frontMask3.png")
@@ -297,6 +298,7 @@ define ('Renderer/ProjectiveTexturing2',[
                             type: 't',
                             value: THREE.TextureLoader("../itowns-sample-data/backMask.png")
                     }
+                  */
 
             };
             
@@ -372,7 +374,7 @@ define ('Renderer/ProjectiveTexturing2',[
             var that = this;
             img.onload = function () { 
                 
-                _shaderMat.uniforms['indice_time'+num].value = .8; //if(num==1) console.log('now!');
+                _shaderMat.uniforms['indice_time'+num].value = 0.;//.8; //if(num==1) console.log('now!');
                 _shaderMat.uniforms['mvpp_current_'+num+'bis'].value = tabMatrices[numImg];
                 _shaderMat.uniforms['factorTranslation'+num+'bis'].value = translationPlusSom;
                 

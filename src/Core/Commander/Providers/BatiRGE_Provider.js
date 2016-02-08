@@ -90,6 +90,8 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
        var url = this.url(longitude,latitude,radius);                    
        // var dataCache = this.cache.getRessource(url);
        
+       var roadOn = true;
+       
        var deferred = when.defer();  
        
        
@@ -207,7 +209,41 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
                                 });
                   
            
+                           
+           
            }
+           
+            if(roadOn){ 
+                   
+                // Version using SIMPLE PLANE ROAD for Click and Go
+                     var roadLength = 0.002;// = 500;
+                     var v1 = _geometry.vertices[0];
+                     var altitude_sol = 47.39;//49.39;
+                     var pos = new THREE.Vector3(48.85,  altitude_sol, 2.334);
+                     
+                     // get first vertices pos
+              //       var pos = ellipsoid.cartographicToCartesian(new CoordCarto().setFromDegreeGeo(48.85,2.334, altitude_sol));
+                     
+                     var coordCarto1 = new CoordCarto().setFromDegreeGeo(pos.x -roadLength ,pos.z -roadLength, altitude_sol);
+                     var coordCarto2 = new CoordCarto().setFromDegreeGeo(pos.x -roadLength ,pos.z +roadLength, altitude_sol);
+                     var coordCarto3 = new CoordCarto().setFromDegreeGeo(pos.x +roadLength, pos.z +roadLength, altitude_sol);
+                     var coordCarto4 = new CoordCarto().setFromDegreeGeo(pos.x +roadLength, pos.z -roadLength, altitude_sol);
+                    
+                     var pgeo1 = ellipsoid.cartographicToCartesian(coordCarto1);
+                     var pgeo2 = ellipsoid.cartographicToCartesian(coordCarto2);
+                     var pgeo3 = ellipsoid.cartographicToCartesian(coordCarto3);
+                     var pgeo4 = ellipsoid.cartographicToCartesian(coordCarto4);
+                     
+                     _geometry.vertices.push(new THREE.Vector3(pgeo1.x, pgeo1.y, pgeo1.z));
+                     _geometry.vertices.push(new THREE.Vector3(pgeo2.x, pgeo2.y, pgeo2.z));
+                     _geometry.vertices.push(new THREE.Vector3(pgeo3.x, pgeo3.y, pgeo3.z));
+                     _geometry.vertices.push(new THREE.Vector3(pgeo4.x, pgeo4.y, pgeo4.z));
+
+
+                     var len = _geometry.vertices.length;
+                     _geometry.faces.push( new THREE.Face3( len-4,len-3,len-2));
+                     _geometry.faces.push( new THREE.Face3( len-4,len-2,len-1));
+            }
            
             _geometry.computeFaceNormals();  // WARNING : VERY IMPORTANT WHILE WORKING WITH RAY CASTING ON CUSTOM MESH
             geometry.computeFaceNormals();
@@ -257,7 +293,8 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
                 deferred.resolve({geometry:_geometry, pivot: firstPos});
            }
            
-            deferred.resolve({geometry:_geometry, pivot: undefined});
+            var firstPos = new THREE.Vector3();
+            deferred.resolve({geometry:_geometry, pivot: firstPos});
         }
 
         var request = new XMLHttpRequest();
