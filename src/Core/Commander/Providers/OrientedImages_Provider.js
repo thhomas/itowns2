@@ -119,8 +119,7 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
         var RTC_ON = true; //false;
         
         batiRGE.generateMesh(2.3348138,48.8506030,0.0025, RTC_ON).then(function(geometry){
-            
- 
+             
             var geom = geometry.geometry;
             console.log("geom",geom);
 
@@ -236,18 +235,12 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
              
 
           //   var posCam = gfxEngine().camera.camera3D.position;
-          if(dist<0.5){
-             gfxEngine().camera.camera3D.position.set(pos.x , pos.y  , pos.z );
-             }else{
-                 gfxEngine().camera.camera3D.position.set(pos.x + dist.x, pos.y + dist.y , pos.z + dist.z);
-                 gfxEngine().camera.camera3D.lookAt(pos.x +1, pos.y +1 , pos.z);
-             }
+
         //     gfxEngine().camera.camera3D.position.set( pos.x + Math.abs(pos.x - posCam)/100 , pos.y + Math.abs(pos.y - posCam)/100, pos.z + Math.abs(pos.z - posCam)/100);
           //  gfxEngine().camera.camera3D.rotation.y += 0.001;
           //   gfxEngine().renderScene(); 
              setTimeout(function(){OrientedImages_Provider.computeRTC2(center, camera, mesh, pos, new THREE.Vector3(dist.x/1.01,dist.y/1.01,dist.z/1.01));}, 6);//1000/60); //OrientedImages_Provider.computeRTC2(center, camera, mesh)
     };
-
 
 
     OrientedImages_Provider.computeRTC = function(center, camera){

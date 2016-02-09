@@ -11,13 +11,13 @@ define('Globe/Globe',[
     'Scene/SchemeTile',
     'Core/Math/MathExtented',
     'Globe/EllipsoidTileMesh',
-    
+    'Renderer/c3DEngine',
     'Globe/Atmosphere',
     'Core/System/Capabilities',
     'Core/Geographic/CoordCarto',
     'Renderer/BasicMaterial',
     'Core/Commander/Providers/OrientedImages_Provider',
-    'THREE'], function(defaultValue,Layer,Quadtree,SchemeTile,MathExt,EllipsoidTileMesh,Atmosphere,Capabilities,CoordCarto,BasicMaterial, OrientedImages_Provider, THREE){
+    'THREE'], function(defaultValue,Layer,Quadtree,SchemeTile,MathExt,EllipsoidTileMesh,gfxEngine,Atmosphere,Capabilities,CoordCarto,BasicMaterial, OrientedImages_Provider, THREE){
 
     function Globe(scale){
         //Constructor
@@ -37,12 +37,18 @@ define('Globe/Globe',[
         
         window.onkeypress = function(event) {
             
-            
-            if(this.immersiveLayer === undefined)
+            if (event.keyCode === 32) {
+                  
+                gfxEngine().camera.camera3D.position.set( -4201501.222931023, 4779679.716959654, 171306.79894435464);
+                gfxEngine().camera.camera3D.fov = 120;
+                gfxEngine().camera.camera3D.updateProjectionMatrix();  
+            }else
+            if(this.immersiveLayer === undefined){
                // Dirty immersiveTest  
                  this.immersiveLayer = new Layer();
                  this.providerOrientedImages = new OrientedImages_Provider();
                  this.providerOrientedImages.getOrientedImageMetaData("aaa",{});
+             }
 
         }.bind(this);
    

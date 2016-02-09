@@ -216,7 +216,7 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
             if(roadOn){ 
                    
                 // Version using SIMPLE PLANE ROAD for Click and Go
-                     var roadLength = 0.002;// = 500;
+                     var roadLength = 0.001;// = 500;
                      var v1 = _geometry.vertices[0];
                      var altitude_sol = 47.39;//49.39;
                      var pos = new THREE.Vector3(48.85,  altitude_sol, 2.334);
@@ -247,16 +247,21 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
            
             _geometry.computeFaceNormals();  // WARNING : VERY IMPORTANT WHILE WORKING WITH RAY CASTING ON CUSTOM MESH
             geometry.computeFaceNormals();
-
+    /*
             var line = new THREE.Line(geometryLine, material);
           //  gfxEngine().add3DScene(line);
             var mat = new THREE.MeshBasicMaterial({color:0xff00ff, side: THREE.DoubleSide, wireframe: true, transparent: false});
             var matBasic= new THREE.MeshBasicMaterial({color: 0xff0000, side: THREE.DoubleSide});
-            var matLambert = new THREE.MeshLambertMaterial({color: 0xaaaaaa, side: 2, shading: THREE.FlatShading, transparent: true, opacity: 0.5});
+           
+    */    
+            var matLambert = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.8});
             var matWireFrame = new THREE.MeshBasicMaterial({color:0x00ff00, side: THREE.DoubleSide, wireframe: true, transparent: false});
-            var _currentMeshForClickAndGo  = new THREE.Mesh(_geometry,matLambert);//geometryClickToGo,mat);
+          //  var _currentMeshForClickAndGo  = new THREE.Mesh(_geometry,matLambert);//geometryClickToGo,mat);
             
-           this.geometry = _geometry;
+            var _currentMeshForRoof  = new THREE.Mesh(geometry,matLambert);// //geometryClickToGo,mat);
+            gfxEngine().add3DScene(_currentMeshForRoof);
+            
+            this.geometry = _geometry;
        /*     
             // Light TEST
             var pointLight = new THREE.PointLight( 0xFFFFFF, 1, 1000000000);
