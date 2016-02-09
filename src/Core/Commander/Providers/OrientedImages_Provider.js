@@ -236,7 +236,12 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
              
 
           //   var posCam = gfxEngine().camera.camera3D.position;
-             gfxEngine().camera.camera3D.position.set(pos.x + dist.x, pos.y + dist.y , pos.z + dist.z);
+          if(dist<0.5){
+             gfxEngine().camera.camera3D.position.set(pos.x , pos.y  , pos.z );
+             }else{
+                 gfxEngine().camera.camera3D.position.set(pos.x + dist.x, pos.y + dist.y , pos.z + dist.z);
+                 gfxEngine().camera.camera3D.lookAt(pos.x +1, pos.y +1 , pos.z);
+             }
         //     gfxEngine().camera.camera3D.position.set( pos.x + Math.abs(pos.x - posCam)/100 , pos.y + Math.abs(pos.y - posCam)/100, pos.z + Math.abs(pos.z - posCam)/100);
           //  gfxEngine().camera.camera3D.rotation.y += 0.001;
           //   gfxEngine().renderScene(); 
