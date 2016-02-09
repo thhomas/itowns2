@@ -324,8 +324,8 @@ define ('Renderer/ProjectiveTexturing2',[
             // Add TO update images resolution and center position of proj
             var vecTrans = Ori.getBarycentreV2(); 
             vecTrans.applyProjection(rot21);
-            this.changePanoTextureAfterloading(date+imgUrl,128,50,new THREE.Vector4(0.,0.,0.,1.),rot21,1);
-       //     gfxEngine.translateCameraSmoothly(vecTrans.x,vecTrans.y,vecTrans.z);
+            //this.changePanoTextureAfterloading(date+imgUrl,128,50,new THREE.Vector4(0.,0.,0.,1.),rot21,1);
+            //     gfxEngine.translateCameraSmoothly(vecTrans.x,vecTrans.y,vecTrans.z);
 
             return _shaderMat;
 	},
@@ -374,12 +374,13 @@ define ('Renderer/ProjectiveTexturing2',[
             var that = this;
             img.onload = function () { 
                 
-                _shaderMat.uniforms['indice_time'+num].value = 0.;//.8; //if(num==1) console.log('now!');
+                _shaderMat.uniforms['indice_time'+num].value = 0.8; //if(num==1) console.log('now!');
                 _shaderMat.uniforms['mvpp_current_'+num+'bis'].value = tabMatrices[numImg];
                 _shaderMat.uniforms['factorTranslation'+num+'bis'].value = translationPlusSom;
                 
                 _shaderMat.uniforms[nameTexture+'bis'].value = new THREE.Texture(this,THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.LinearFilter,THREE.LinearFilter,THREE.RGBFormat);
                 _shaderMat.uniforms[nameTexture+'bis'].value.needsUpdate = true;
+               
              //   if(nbLevel==1 && !that.localImageFiles) that.changeQuality(imgName,nameTexture,num,512,qlt,numImg);  // Load level 2
               //  if(that.localImageFiles) graphicEngine.setSpeedTurnCam(0.1);
             }; 

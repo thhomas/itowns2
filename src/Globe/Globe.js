@@ -37,12 +37,22 @@ define('Globe/Globe',[
         
         window.onkeypress = function(event) {
             
+
             if (event.keyCode === 32) {
                   
                 gfxEngine().camera.camera3D.position.set( -4201501.222931023, 4779679.716959654, 171306.79894435464);
-                gfxEngine().camera.camera3D.fov = 120;
+                //gfxEngine().camera.camera3D.fov = 105;
                 gfxEngine().camera.camera3D.updateProjectionMatrix();  
+                gfxEngine().scene.browserScene.freeze = !gfxEngine().scene.browserScene.freeze;
+                console.log("*****FREEZE: ",gfxEngine().scene.browserScene.freeze);
             }else
+                
+             if (event.keyCode === 97) {
+                 gfxEngine().scene.browserScene.freeze = true;
+                  console.log("nav");
+                this.providerOrientedImages.navigate();
+             }else
+            
             if(this.immersiveLayer === undefined){
                // Dirty immersiveTest  
                  this.immersiveLayer = new Layer();

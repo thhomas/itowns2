@@ -13,9 +13,9 @@ define('Renderer/Camera',['Scene/Node','THREE'], function(Node, THREE){
         Node.call( this );
                 
         this.ratio      = width/height;                
-        this.FOV        = 30;
+        this.FOV        = 60;
 
-        this.camera3D   = new THREE.PerspectiveCamera( 30, this.ratio);
+        this.camera3D   = new THREE.PerspectiveCamera( this.FOV, this.ratio);
         this.camera3D.matrixAutoUpdate     = false;
         this.camera3D.rotationAutoUpdate   = false;
 
@@ -25,7 +25,7 @@ define('Renderer/Camera',['Scene/Node','THREE'], function(Node, THREE){
         this.height     = height;
         this.Hypotenuse = Math.sqrt(this.width*this.width + this.height*this.height);
         
-        var radAngle    = this.FOV * Math.PI / 180;
+        var radAngle    = this.FOV/3 * Math.PI / 180;
         this.HFOV       = 2.0 * Math.atan(Math.tan(radAngle*0.5) / this.ratio); // TODO surement faux               
         this.HYFOV      = 2.0 * Math.atan(Math.tan(radAngle*0.5) * this.Hypotenuse  / this.width );                
         this.preSSE     = this.Hypotenuse * (2.0 * Math.tan(this.HYFOV * 0.5));
@@ -70,7 +70,7 @@ define('Renderer/Camera',['Scene/Node','THREE'], function(Node, THREE){
         
         this.Hypotenuse = Math.sqrt(this.width*this.width + this.height*this.height);
         
-        var radAngle    = this.FOV * Math.PI / 180;        
+        var radAngle    = this.FOV/3 * Math.PI / 180;        
         
         this.HYFOV      = 2.0 * Math.atan(Math.tan(radAngle*0.5) * this.Hypotenuse / this.width );  
         

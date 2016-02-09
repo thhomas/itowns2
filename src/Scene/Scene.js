@@ -30,7 +30,7 @@ define('Scene/Scene',[
         if(instanceScene !== null){
             throw new Error("Cannot instantiate more than one Scene");
         }         
-        this.layers          = [];            
+        this.layers         = [];            
         this.cameras        = null;        
         this.selectNodes    = null;      
         this.managerCommand = ManagerCommands();
@@ -99,13 +99,6 @@ define('Scene/Scene',[
     };
 
     /**
-    */
-    Scene.prototype.updateCamera = function(){
-        //TODO: Implement Me 
-
-    };
-
-    /**
      * 
      * @param {type} run
      * @returns {undefined}
@@ -114,7 +107,7 @@ define('Scene/Scene',[
         
         //console.log(this.managerCommand.queueAsync.length);
         
-        if(this.layers[0] !== undefined  && this.currentCamera() !== undefined )
+        if(this.layers[0] !== undefined  && this.currentCamera() !== undefined)
         {                        
         
             this.browserScene.browse(this.layers[0].terrain,this.currentCamera(),true);

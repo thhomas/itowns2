@@ -14,7 +14,6 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
             'Core/Math/Ellipsoid',
             'Core/Geographic/CoordCarto',
             'Renderer/c3DEngine',
-            'Scene/BrowseTree',
             'THREE',
             'Renderer/Ori',
             'Core/Commander/Providers/CacheRessource',
@@ -28,7 +27,6 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
                 Ellipsoid,
                 CoordCarto,
                 gfxEngine,
-                BrowseTree,
                 THREE,      
                 Ori,
                 CacheRessource,
@@ -36,7 +34,9 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
                     
                     
                    var  _projectiveMaterial = null,
-                        _mesh = null;
+                        _mesh = null,
+                        _geometry = null,
+                        _pivot = null;
 
                 
     function OrientedImages_Provider()
@@ -119,8 +119,11 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
         var RTC_ON = true; //false;
         
         batiRGE.generateMesh(2.3348138,48.8506030,0.0025, RTC_ON).then(function(geometry){
-             
+ 
             var geom = geometry.geometry;
+            _geometry = geometry.geometry;
+            _pivot = geometry.pivot;
+            
             console.log("geom",geom);
 
             if(URLServiceOrientedImages === undefined)
@@ -142,10 +145,18 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
                 pan_xml_heading_pp:176.117188,pan_xml_roll_pp:0.126007,pan_xml_pitch_pp:1.280821,
                 pan_time_utc:"12:31:34.84099999998463"};
             
+           var p2 = {filename:"Paris-140616_0740-00-00001_0000483",
+               easting:651187.63,northing:6861376.21,altitude:39.43,
+               pan_xml_heading_pp:182.681473,pan_xml_roll_pp:0.251712,pan_xml_pitch_pp:1.253257,
+               pan_time_utc:"12:31:35.59099999998395"};
+            // P2 2,3348124 48,8505774
+            // 
              // Lon lat p = 2,3348138   48,8506030
              // POS in 3D scene of the panoramic
              var posCarto = new CoordCarto().setFromDegreeGeo(48.8506030,2.3348138, 49.39);
              var posCartesien = ellipsoid.cartographicToCartesian(posCarto);
+             var posCarto2 = new CoordCarto().setFromDegreeGeo(48,8505774, 2,3348124, 49.43);
+             var posCartesien2 = ellipsoid.cartographicToCartesian(posCarto2);
              
              var spherePosPano = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 16, 16 ), new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color:0xff00ff}));
              spherePosPano.position.set(posCartesien.x, posCartesien.y, posCartesien.z);
@@ -182,11 +193,11 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
             var posPiv = position.clone().sub(geometry.pivot);
             var positionOriginale = new THREE.Vector4(posCartesien.x, posCartesien.y, posCartesien.z, 1.);
             var positionCamWithPivot = RTC_ON  ? new THREE.Vector4(posPiv.x, posPiv.y, posPiv.z, 1.) : positionOriginale;
-            
+            console.log("positionCamWithPivot ",positionCamWithPivot);
             // console.log("positionCamWithPivot ",positionCamWithPivot, positionCamWithoutPivot);
             ProjectiveTexturing2.init(matRotation);
             _projectiveMaterial = ProjectiveTexturing2.createShaderForImage(p.filename/*this.panoInfo.filename*/,50);
-            ProjectiveTexturing2.changePanoTextureAfterloading("140616/"+p.filename,512,50, positionCamWithPivot, /*child.matrix*/matRotation,1);
+            ProjectiveTexturing2.changePanoTextureAfterloading("140616/"+p.filename,512,50, positionCamWithPivot, matRotation, 1);
             
             var mat = new THREE.MeshBasicMaterial({color:0xff00ff});
                                                     //  var mesh  = new THREE.Mesh(geometry,mat);
@@ -220,6 +231,78 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
         
     };
     
+    
+    OrientedImages_Provider.prototype.navigate = function(){
+        
+
+            var RTC_ON = true;
+            var p = {filename:"Paris-140616_0740-00-00001_0000483",
+               easting:651187.63,northing:6861376.21,altitude:39.43,
+               pan_xml_heading_pp:182.681473,pan_xml_roll_pp:0.251712,pan_xml_pitch_pp:1.253257,
+               pan_time_utc:"12:31:35.59099999998395"};
+            // P 2,3348124 48,8505774
+            
+             // Lon lat p = 2,3348138   48,8506030
+             // POS in 3D scene of the panoramic
+             var posCarto = new CoordCarto().setFromDegreeGeo(48.8505774, 2.3348124, 49.43);
+             var ellipsoid  = new Ellipsoid(new THREE.Vector3(6378137, 6356752.3142451793, 6378137));
+             var posCartesien = ellipsoid.cartographicToCartesian(posCarto);
+
+             var matRotation = new THREE.Matrix4();
+             matRotation = Ori.computeMatOriFromHeadingPitchRoll(
+                                        p.pan_xml_heading_pp,
+                                        p.pan_xml_pitch_pp,
+                                        p.pan_xml_roll_pp
+                                    );
+                            
+         
+        
+            // Then we need to set the rotation with the normal at the center of the pano
+            // Orientation on normal    
+            var normal      = ellipsoid.geodeticSurfaceNormalCartographic(posCarto);
+            var quaternion  = new THREE.Quaternion();
+            quaternion.setFromAxisAngle( new THREE.Vector3(1, 0 ,0 ), Math.PI/2 );
+
+            var child = new THREE.Object3D();
+            var localTarget = new THREE.Vector3().addVectors ( posCartesien.clone(), normal );
+            child.lookAt(localTarget);
+            child.quaternion.multiply(quaternion );                
+            child.updateMatrix();
+
+            var matRotationGlobe = new THREE.Matrix4().multiplyMatrices(matRotation.clone(),child.matrix);
+            matRotation = matRotationGlobe;
+                                                           
+            var position = new THREE.Vector3(posCartesien.x, posCartesien.y, posCartesien.z); 
+            var posPiv = position.clone().sub(_pivot.clone());
+            var positionOriginale = new THREE.Vector4(posCartesien.x, posCartesien.y, posCartesien.z, 1.);
+            var positionCamWithPivot = RTC_ON  ? new THREE.Vector4(posPiv.x, posPiv.y, posPiv.z, 1.) : positionOriginale;
+
+            console.log("positionCamWithPivot ",positionCamWithPivot, "pivo",_pivot);
+            ProjectiveTexturing2.changePanoTextureAfterloading("140616/"+p.filename,512,50, positionCamWithPivot, matRotation, 1);
+            
+            //gfxEngine().camera.camera3D.position.set( posCartesien.x, posCartesien.y, posCartesien.z);
+            OrientedImages_Provider.smoothTransition(posCartesien);
+
+    };
+    
+    OrientedImages_Provider.smoothTransition = function(pos, lastPos){
+        
+       var speedMove = 0.1; 
+       var currentPos = gfxEngine().camera.camera3D.position.clone();
+        
+      // var newPos =  currentPos.sub(pos.clone());
+       var posx = currentPos.x + (pos.x - currentPos.x) * speedMove;
+       var posy = currentPos.y + (pos.y - currentPos.y) * speedMove;
+       var posz = currentPos.z + (pos.z - currentPos.z) * speedMove;
+       
+       gfxEngine().camera.camera3D.position.set( posx, posy, posz);
+       var vCurrent = new THREE.Vector3(posx, posy, posz);
+       //console.log(posx,posy, posz);
+       //requestAnimSelectionAlpha(OrientedImages_Provider.smoothTransition(pos,new THREE.Vector3(posx, posy, posz)));
+       
+       if(vCurrent.distanceTo(pos) > 0.02)
+          setTimeout(function(){OrientedImages_Provider.smoothTransition(pos, vCurrent);}, 20);
+    };
     
         // Super dirty (temp for local test)
     OrientedImages_Provider.computeRTC2 = function(center, camera, mesh, pos, dist){
