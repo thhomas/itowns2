@@ -38,7 +38,7 @@ define('Globe/Globe',[
         window.onkeypress = function(event) {
             
 
-            if (event.keyCode === 32) {
+            if (event.keyCode === 32) {  // Space
                   
                 gfxEngine().camera.camera3D.position.set( -4201501.222931023, 4779679.716959654, 171306.79894435464);
                 //gfxEngine().camera.camera3D.fov = 105;
@@ -47,7 +47,7 @@ define('Globe/Globe',[
                 console.log("*****FREEZE: ",gfxEngine().scene.browserScene.freeze);
             }else
                 
-             if (event.keyCode === 97) {
+             if (event.keyCode === 97) { // A
                  gfxEngine().scene.browserScene.freeze = true;
                   console.log("nav");
                 this.providerOrientedImages.navigate();
