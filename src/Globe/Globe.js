@@ -38,19 +38,17 @@ define('Globe/Globe',[
         window.onkeypress = function(event) {
             
 
-            if (event.keyCode === 32) {  // Space
+            if (event.keyCode === 98) {  // B
                   
-                gfxEngine().camera.camera3D.position.set( -4201501.222931023, 4779679.716959654, 171306.79894435464);
-                //gfxEngine().camera.camera3D.fov = 105;
-                gfxEngine().camera.camera3D.updateProjectionMatrix();  
+                //gfxEngine().camera.camera3D.position.set( -4201501.222931023, 4779679.716959654, 171306.79894435464);
+               // gfxEngine().camera.camera3D.updateProjectionMatrix();  
                 gfxEngine().scene.browserScene.freeze = !gfxEngine().scene.browserScene.freeze;
-                console.log("*****FREEZE: ",gfxEngine().scene.browserScene.freeze);
             }else
                 
              if (event.keyCode === 97) { // A
-                 gfxEngine().scene.browserScene.freeze = true;
+                  // gfxEngine().scene.browserScene.freeze = true;
                   console.log("nav");
-                this.providerOrientedImages.navigate();
+                  this.providerOrientedImages.navigate();
              }else
             
             if(this.immersiveLayer === undefined){

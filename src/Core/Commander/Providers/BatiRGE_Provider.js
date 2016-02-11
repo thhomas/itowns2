@@ -216,10 +216,10 @@ define('Core/Commander/Providers/BatiRGE_Provider',[
             if(roadOn){ 
                    
                 // Version using SIMPLE PLANE ROAD for Click and Go
-                     var roadLength = 0.001;// = 500;
+                     var roadLength = 0.0003;// = 500;
                      var v1 = _geometry.vertices[0];
-                     var altitude_sol = 47.39;//49.39;
-                     var pos = new THREE.Vector3(48.85,  altitude_sol, 2.334);
+                     var altitude_sol = 47.39;//49.39;48.8505774, 2.3348124, 49.43
+                     var pos = new THREE.Vector3(48.8505774,  altitude_sol, 2.3348124);
                      
                      // get first vertices pos
               //       var pos = ellipsoid.cartographicToCartesian(new CoordCarto().setFromDegreeGeo(48.85,2.334, altitude_sol));

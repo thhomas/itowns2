@@ -86,9 +86,9 @@
         const float lpps = 1020.435;
         const vec2 pps = vec2(cpps,lpps);
 
-        vec4 color = vec4(0.5,0.5,0.,0.);	
+        vec4 color = vec4(1.,1.,1.,0.);	
         vec4 colorbis = vec4(0.,0.,0.,0.);
-        vec4 saveColor = vec4(0.5,0.5,0.,0.);
+        vec4 saveColor = vec4(1.,1.,1.,0.);
 
         vec2 corrected0, corrected1,corrected2,corrected3,corrected4;
         vec2 corrected0bis, corrected1bis,corrected2bis,corrected3bis,corrected4bis;

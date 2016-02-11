@@ -161,7 +161,7 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
              var spherePosPano = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 16, 16 ), new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color:0xff00ff}));
              spherePosPano.position.set(posCartesien.x, posCartesien.y, posCartesien.z);
              console.log(posCartesien);
-             gfxEngine().add3DScene(spherePosPano);
+            // gfxEngine().add3DScene(spherePosPano);
              
              var matRotation = new THREE.Matrix4();
              matRotation = Ori.computeMatOriFromHeadingPitchRoll(
@@ -287,7 +287,7 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
     
     OrientedImages_Provider.smoothTransition = function(pos, lastPos){
         
-       var speedMove = 0.1; 
+       var speedMove = 0.015; 
        var currentPos = gfxEngine().camera.camera3D.position.clone();
         
       // var newPos =  currentPos.sub(pos.clone());
@@ -297,7 +297,6 @@ define('Core/Commander/Providers/OrientedImages_Provider',[
        
        gfxEngine().camera.camera3D.position.set( posx, posy, posz);
        var vCurrent = new THREE.Vector3(posx, posy, posz);
-       //console.log(posx,posy, posz);
        //requestAnimSelectionAlpha(OrientedImages_Provider.smoothTransition(pos,new THREE.Vector3(posx, posy, posz)));
        
        if(vCurrent.distanceTo(pos) > 0.02)
