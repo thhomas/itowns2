@@ -4,4 +4,3 @@
 # See https://github.com/github/gitignore/tree/master/Global for a list of global ignore rules.
 
 /node_modules/
-/dist/
