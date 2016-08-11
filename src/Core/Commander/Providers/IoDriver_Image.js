@@ -4,51 +4,33 @@
  */
 
 
-define('Core/Commander/Providers/IoDriver_Image', ['Core/Commander/Providers/IoDriver', 'when'], function(IoDriver, when) {
+import IoDriver from 'Core/Commander/Providers/IoDriver';
 
 
-    function IoDriver_Image() {
-        //Constructor
-        IoDriver.call(this);
+function IoDriver_Image() {
+    //Constructor
+    IoDriver.call(this);
 
-    }
+}
 
-    IoDriver_Image.prototype = Object.create(IoDriver.prototype);
+IoDriver_Image.prototype = Object.create(IoDriver.prototype);
 
-    IoDriver_Image.prototype.constructor = IoDriver_Image;
+IoDriver_Image.prototype.constructor = IoDriver_Image;
 
-    IoDriver_Image.prototype.read = function(url) {
+IoDriver_Image.prototype.read = function(url) {
 
-        var deferred = when.defer();
+    return new Promise(function(resolve, reject) {
+
         var image = new Image();
 
-        image.addEventListener('load', function(event) {
+        image.onload = () => resolve(image);
 
-            deferred.resolve(this);
-
-        }, false);
-
-        image.addEventListener('progress', function(event) {
-
-        }, false);
-
-
-        image.addEventListener('error', function(event) {
-
-
-            //TODO bug il faut tester quand l'image n'existe pas 
-            deferred.resolve(this);
-            //deferred.reject(Error("Error IoDriver_Image"));        
-
-        }, false);
+        image.onerror = () => reject(new Error(`Error loading ${url}`));
 
         image.crossOrigin = '';
         image.src = url;
 
-        return deferred;
+    });
+};
 
-    };
-
-    return IoDriver_Image;
-
-});
+export default IoDriver_Image;

@@ -1,87 +1,121 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
 
-define('Renderer/BasicMaterial', ['THREE',
-    'Core/defaultValue',
-    'Renderer/Shader/SimpleVS.glsl',
-    'Renderer/Shader/SimpleFS.glsl'
-], function(
-    THREE,
-    defaultValue,
-    SimpleVS,
-    SimpleFS) {
+import THREE from 'THREE';
+import defaultValue from 'Core/defaultValue';
+import c3DEngine from 'Renderer/c3DEngine';
+import SimpleVS from 'Renderer/Shader/SimpleVS.glsl';
+import SimpleFS from 'Renderer/Shader/SimpleFS.glsl';
+import LogDepthBuffer from 'Renderer/Shader/Chunk/LogDepthBuffer.glsl';
 
-    function BasicMaterial(color) {
-        //Constructor
+function BasicMaterial(color) {
+    //Constructor
 
-        THREE.ShaderMaterial.call(this);
+    THREE.RawShaderMaterial.call(this);
 
-        this.vertexShader = SimpleVS;
-        this.fragmentShader = SimpleFS;
+    this.vertexShaderHeader = '';
+    this.fragmentShaderHeader = '';
 
-        this.uniforms = {
-            diffuseColor: {
-                type: "c",
-                value: defaultValue(color, new THREE.Color())
-            },
-            RTC: {
-                type: "i",
-                value: 1
-            },
-            mVPMatRTC: {
-                type: "m4",
-                value: new THREE.Matrix4()
-            },
-            distanceFog: {
-                type: "f",
-                value: 1000000000.0
-            },
-            uuid: {
-                type: "i",
-                value: 0
-            },
-            debug: {
-                type: "i",
-                value: false
-            },
-            selected: {
-                type: "i",
-                value: false
-            }
+    var logarithmicDepthBuffer = c3DEngine().renderer.capabilities.logarithmicDepthBuffer;
 
-        };
+    if(logarithmicDepthBuffer)
+    {
+        this.fragmentShaderHeader += '#extension GL_EXT_frag_depth : enable\n';
     }
 
-    BasicMaterial.prototype = Object.create(THREE.ShaderMaterial.prototype);
-    BasicMaterial.prototype.constructor = BasicMaterial;
+    this.fragmentShaderHeader +='precision highp float;\n';
+    this.fragmentShaderHeader +='precision highp int;\n';
 
-    BasicMaterial.prototype.enableRTC = function(enable) {
-        this.uniforms.RTC.value = enable === true ? 1 : 0;
+
+    if(logarithmicDepthBuffer)
+    {
+        this.fragmentShaderHeader +='#define USE_LOGDEPTHBUF\n';
+        this.fragmentShaderHeader +='#define USE_LOGDEPTHBUF_EXT\n';
+		this.fragmentShaderHeader += LogDepthBuffer;
+    }
+
+	this.fragmentShaderHeader +='#define VERTEX_TEXTURES\n';
+	this.vertexShaderHeader = this.fragmentShaderHeader;
+
+	this.vertexShader = this.vertexShaderHeader + SimpleVS;
+	this.fragmentShader = this.fragmentShaderHeader + SimpleFS;
+
+    this.uniforms = {
+        diffuseColor: {
+            type: "c",
+            value: defaultValue(color, new THREE.Color())
+        },
+        RTC: {
+            type: "i",
+            value: 1
+        },
+        mVPMatRTC: {
+            type: "m4",
+            value: new THREE.Matrix4()
+        },
+        distanceFog: {
+            type: "f",
+            value: 1000000000.0
+        },
+        uuid: {
+            type: "i",
+            value: 0
+        },
+        debug: {
+            type: "i",
+            value: false
+        },
+        selected: {
+            type: "i",
+            value: false
+        },
+        lightOn: {
+            type: "i",
+            value: true
+        }
+
     };
+}
 
-    BasicMaterial.prototype.setDebug = function(debug_value) {
-        this.uniforms.debug.value = debug_value;
-    };
+BasicMaterial.prototype = Object.create(THREE.RawShaderMaterial.prototype);
+BasicMaterial.prototype.constructor = BasicMaterial;
 
-    BasicMaterial.prototype.setMatrixRTC = function(rtc) {
-        this.uniforms.mVPMatRTC.value = rtc;
-    };
-    BasicMaterial.prototype.setUuid = function(uuid) {
-        this.uniforms.uuid.value = uuid;
-    };
+BasicMaterial.prototype.enableRTC = function(enable) {
+    this.uniforms.RTC.value = enable === true ? 1 : 0;
+};
 
-    BasicMaterial.prototype.setFogDistance = function(df) {
-        this.uniforms.distanceFog.value = df;
-    };
+BasicMaterial.prototype.setDebug = function(debug_value) {
+    this.uniforms.debug.value = debug_value;
+};
 
-    BasicMaterial.prototype.setSelected = function(selected) {
-        this.uniforms.selected.value = selected;
-    };
+BasicMaterial.prototype.setMatrixRTC = function(rtc) {
+    this.uniforms.mVPMatRTC.value = rtc;
+};
 
-    return BasicMaterial;
+BasicMaterial.prototype.getMatrixRTC = function() {
+    return this.uniforms.mVPMatRTC.value;
+};
 
-});
+BasicMaterial.prototype.setUuid = function(uuid) {
+
+    this.uniforms.uuid.value = uuid;
+};
+
+BasicMaterial.prototype.getUuid = function() {
+
+    return this.uniforms.uuid.value;
+};
+
+BasicMaterial.prototype.setFogDistance = function(df) {
+    this.uniforms.distanceFog.value = df;
+};
+
+BasicMaterial.prototype.setSelected = function(selected) {
+    this.uniforms.selected.value = selected ? 1 : 0;
+};
+
+export default BasicMaterial;

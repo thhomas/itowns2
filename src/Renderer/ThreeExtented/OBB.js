@@ -1,26 +1,45 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
 
-var THREE = require('three');
+import THREE from 'three';
 
-THREE.OBB = function(min, max) {
+function OBB(min, max, lookAt, translate) {
     THREE.Object3D.call(this);
     this.box3D = new THREE.Box3(min, max);
 
+    this.natBox = this.box3D.clone();
+
     this.quaInv = this.quaternion.clone().inverse();
+
+
+    if (lookAt)
+        this.lookAt(lookAt);
+
+
+    if (translate) {
+        this.translateX(translate.x);
+        this.translateY(translate.y);
+        this.translateZ(translate.z);
+    }
+
+    this.oPosition = new THREE.Vector3();
+
+    this.update();
+
+    this.oPosition = this.position.clone();
 
     this.pointsWorld;
 
-};
+}
 
-THREE.OBB.prototype = Object.create(THREE.Object3D.prototype);
-THREE.OBB.prototype.constructor = THREE.OBB;
+OBB.prototype = Object.create(THREE.Object3D.prototype);
+OBB.prototype.constructor = OBB;
 
-THREE.OBB.prototype.update = function() {
+OBB.prototype.update = function() {
 
     this.updateMatrix();
     this.updateMatrixWorld();
@@ -30,17 +49,17 @@ THREE.OBB.prototype.update = function() {
     this.pointsWorld = this.cPointsWorld(this.points());
 };
 
-THREE.OBB.prototype.quadInverse = function() {
+OBB.prototype.quadInverse = function() {
 
     return this.quaInv;
 };
 
-THREE.OBB.prototype.addHeight = function(bbox) {
+OBB.prototype.addHeight = function(bbox) {
 
-    var depth = Math.abs(this.box3D.min.z - this.box3D.max.z);
-    // 
-    this.box3D.min.z += bbox.minCarto.altitude;
-    this.box3D.max.z += bbox.maxCarto.altitude;
+    var depth = Math.abs(this.natBox.min.z - this.natBox.max.z);
+    //
+    this.box3D.min.z = this.natBox.min.z + bbox.minCarto.altitude;
+    this.box3D.max.z = this.natBox.max.z + bbox.maxCarto.altitude;
 
     // TODO à vérifier --->
 
@@ -49,16 +68,20 @@ THREE.OBB.prototype.addHeight = function(bbox) {
     this.box3D.min.z = -nHalfSize;
     this.box3D.max.z = nHalfSize;
 
+    this.position.copy(this.oPosition);
+    //    this.updateMatrix();
+    //    this.updateMatrixWorld(true);
+
     this.translateZ(translaZ);
 
     this.update();
 
     return new THREE.Vector2(nHalfSize - depth * 0.5, translaZ);
 
-    // TODO <---- à vérifier 
+    // TODO <---- à vérifier
 };
 
-THREE.OBB.prototype.points = function() {
+OBB.prototype.points = function() {
 
     var points = [
         new THREE.Vector3(),
@@ -83,7 +106,7 @@ THREE.OBB.prototype.points = function() {
     return points;
 };
 
-THREE.OBB.prototype.cPointsWorld = function(points) {
+OBB.prototype.cPointsWorld = function(points) {
 
     var m = this.matrixWorld;
 
@@ -94,3 +117,5 @@ THREE.OBB.prototype.cPointsWorld = function(points) {
     return points;
 
 };
+
+export default OBB;

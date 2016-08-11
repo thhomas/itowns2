@@ -1,13 +1,13 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
 
-var THREE = require('three');
+import THREE from 'three';
 
-THREE.StarGeometry = function() {
+function StarGeometry() {
     THREE.Geometry.call(this);
 
     for (var i = 0; i < 10000; i++) {
@@ -20,7 +20,9 @@ THREE.StarGeometry = function() {
         this.vertices.push(vertex);
 
     }
-};
+}
 
-THREE.StarGeometry.prototype = Object.create(THREE.Geometry.prototype);
-THREE.StarGeometry.prototype.constructor = THREE.StarGeometry;
+StarGeometry.prototype = Object.create(THREE.Geometry.prototype);
+StarGeometry.prototype.constructor = StarGeometry;
+
+export default StarGeometry;

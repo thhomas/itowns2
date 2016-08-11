@@ -4,222 +4,272 @@
  * Description: BrowseTree parcourt un arbre de Node. Lors du parcours un ou plusieur NodeProcess peut etre appliqué sur certains Node.
  */
 
-define('Scene/BrowseTree', ['Globe/EllipsoidTileMesh', 'THREE'], function( EllipsoidTileMesh, THREE) {
+import THREE from 'THREE';
 
-    function BrowseTree(engine) {
-        //Constructor
+function BrowseTree(engine) {
+    //Constructor
 
-        this.oneNode = 0;
-        this.gfxEngine = engine;
-        this.nodeProcess = undefined;
-        this.tree = undefined;
-        this.date = new Date();
-        this.fogDistance = 1000000000.0;
-        this.mfogDistance = 1000000000.0;
-        this.visibleNodes = 0;
-        this.selectNodeId = -1;
-        this.selectNode = null;
-        this.cachedRTC = null;
+    this.oneNode = 0;
+    this.gfxEngine = engine;
+    this.nodeProcess = undefined;
+    this.tree = undefined;
+    this.fogDistance = 1000000000.0;
+    this.mfogDistance = 1000000000.0;
+    this.selectedNodeId = -1;
+    this.selectedNode = null;
 
+    this.selectNode = function(node) {
+        this._selectNode(node);
+    };
+
+    this._resetQuadtreeNode = function(node) {
+        node.setVisibility(false);
+        node.setDisplayed(false);
+        node.setSelected(false);
+    };
+
+}
+
+BrowseTree.prototype.addNodeProcess = function(nodeProcess) {
+    this.nodeProcess = nodeProcess;
+};
+
+BrowseTree.prototype.NodeProcess = function() {
+    return this.nodeProcess;
+};
+
+BrowseTree.prototype.resetQuadtreeNode = function(node) {
+    this._resetQuadtreeNode(node);
+};
+
+/**
+ * @documentation: Process to apply to each node
+ * @param {type} node   : node current to apply process
+ * @param {type} camera : current camera needed to process
+ * @param {type} enableUp  : optional process
+ * @returns {Boolean}
+ */
+BrowseTree.prototype.quadtreeNodeVisibilityUpdate = function(node, camera, process, params) {
+    var wasVisible = node.isVisible();
+    var isVisible = !process.isCulled(node, camera);
+
+    this.resetQuadtreeNode(node);
+    node.setVisibility(isVisible);
+
+    // Displayed if visible.
+    // process.SSE() can modify the displayed property if needed
+    // (e.g on subdivision)
+    node.setDisplayed(isVisible);
+
+    if (isVisible) {
+        process.SSE(node, camera, params);
+
+        this.uniformsProcess(node, camera);
     }
 
+    return wasVisible || isVisible;
+};
 
-    BrowseTree.prototype.addNodeProcess = function(nodeProcess) {
-        this.nodeProcess = nodeProcess;
+BrowseTree.prototype.uniformsProcess = function() {
+
+    var positionWorld = new THREE.Vector3();
+
+    return function(node, camera) {
+
+        node.setMatrixRTC(this.gfxEngine.getRTCMatrixFromCenter(positionWorld.setFromMatrixPosition(node.matrixWorld), camera));
+        node.setFog(this.fogDistance);
+
+        this.selectNode(node);
+
     };
 
-    BrowseTree.prototype.NodeProcess = function() {
-        return this.nodeProcess;
+}();
+
+BrowseTree.prototype._selectNode = function(node) {
+    if (node.id === this.selectedNodeId) {
+        node.setSelected(node.visible && node.material.visible);
+        if (this.selectedNode !== node) {
+            this.selectedNode = node;
+            /* eslint-disable no-alert, no-console */
+            console.info(node);
+            /* eslint-enable no-alert, no-console */
+        }
+    }
+};
+
+/**
+ * @documentation: Initiate traverse tree
+ * @param {type} tree       : tree
+ * @param {type} camera     : current camera
+ * @param {type} process    : the process to apply to each node
+ * @param {type} optional   : optional process
+ * @returns {undefined}
+ */
+BrowseTree.prototype.browse = function(tree, camera, process, layersConfig, optional) {
+    this.tree = tree;
+
+    camera.updateMatrixWorld();
+
+    this.fogDistance = this.mfogDistance * Math.pow((camera.getDistanceFromOrigin() - 6300000) / 25000000, 1.6);
+
+    process.prepare(camera);
+
+    var action = (optional === 2) ? 'clean' : 'visibility_update';
+    var params = {
+        tree: this.tree,
+        withUp: (optional === 1),
+        layersConfig: layersConfig
     };
 
-    /**
-     * @documentation: Process to apply to each node
-     * @param {type} node   : node current to apply process
-     * @param {type} camera : current camera needed to process
-     * @param {type} optional  : optional process
-     * @returns {Boolean}
-     */
-    BrowseTree.prototype.processNode = function(node, camera, optional) {
-        if (node instanceof EllipsoidTileMesh) {
+    var rootNode = tree.children[0];
 
-            node.setVisibility(false);
-            node.setSelected(false);
+    for (var i = 0; i < rootNode.children.length; i++) {
+        this._browse(rootNode.children[i], camera, process, action, params);
+    }
 
-            if (node.loaded && this.nodeProcess.frustumCullingOBB(node, camera)) {
-                if (this.nodeProcess.horizonCulling(node, camera)) {
+};
 
-                    if (node.parent.material !== undefined && node.parent.material.visible === true)
-
-                    { return node.setVisibility(false); }
-
-                    var sse = this.nodeProcess.SSE(node, camera);
-
-                    if (optional && (sse || node.level < 2) && node.material.visible === true && node.wait === false)
-
-                        this.tree.subdivide(node);
-
-                    else if (!sse && node.level >= 2 && node.material.visible === false && node.wait === false) {
-
-                        node.setMaterialVisibility(true);
-                        this.uniformsProcess(node, camera);
-                        node.setChildrenVisibility(false);
-                        
-
-                        return false;
+/**
+ * @documentation: Recursive traverse tree
+ * @param {type} node       : current node
+ * @param {type} camera     : current camera
+ * @param {type} process    : the process to apply to each node
+ * @param {type} optional   : optional process
+ * @returns {undefined}
+ */
+BrowseTree.prototype._browse = function(node, camera, process, action, params) {
+    switch (action) {
+        case 'visibility_update':
+            {
+                if (this.quadtreeNodeVisibilityUpdate(node, camera, process, params)) {
+                    var child_action = node.isDisplayed() ? 'hide_all' : action;
+                    for (var i = 0; i < node.children.length; i++) {
+                        this._browse(node.children[i], camera, process, child_action, params);
                     }
                 }
             }
-
-            if (node.visible && node.material.visible)
-                this.uniformsProcess(node, camera);
-
-            return node.visible;
-        }
-
-        return true;
-    };
-
-
-    BrowseTree.prototype.uniformsProcess = function(node, camera) {
-        node.setMatrixRTC(this.gfxEngine.getRTCMatrixFromCenter(node.absoluteCenter, camera));
-        
-        if (node.id === this.selectNodeId) {
-            node.setSelected(node.visible && node.material.visible);
-            if (this.selectNode !== node) {
-                this.selectNode = node;
-                console.log(node);
+            break;
+        case 'hide_all':
+            {
+                if (node.isVisible()) {
+                    this.resetQuadtreeNode(node);
+                    node.setVisibility(!process.isCulled(node, camera));
+                    node.setDisplayed(false);
+                    for (var j = 0; j < node.children.length; j++) {
+                        this._browse(node.children[j], camera, process, action, params);
+                    }
+                }
             }
-        }
+            break;
+        case 'clean':
+            {
+                this._clean(node, node.level + 2, process, camera);
+            }
+            break;
+        default:
+            {
+                //console.error('Unknown action ', action);
+            }
+    }
+};
 
-        node.setFog(this.fogDistance);
-    };
+BrowseTree.prototype._clean = function(node, level, process, camera) {
+    // update node's sse value
+    node.sse = camera.computeNodeSSE(node);
 
-    /**
-     * @documentation: Initiate traverse tree 
-     * @param {type} tree       : tree 
-     * @param {type} camera     : current camera
-     * @param {type} optional   : optional process
-     * @returns {undefined}
-     */
-    BrowseTree.prototype.browse = function(tree, camera, optional) {
+    var sse = process.checkNodeSSE(node);
 
-        this.tree = tree;
-        
-        // TODO move to camera class
-        camera.camera3D.updateMatrix();
-        camera.camera3D.updateMatrixWorld(true);
-        camera.camera3D.matrixWorldInverse.getInverse(camera.camera3D.matrixWorld);
-        var distance = camera.camera3D.position.length();
-        // <---        
-        this.fogDistance = this.mfogDistance * Math.pow((distance - 6300000) / 25000000, 1.6);
-
-        this.nodeProcess.preHorizonCulling(camera);
-
-        for (var i = 0; i < tree.children.length; i++)
-            this._browse(tree.children[i], camera, optional);
-    };
-
-    /**
-     * @documentation: Recursive traverse tree
-     * @param {type} node       : current node     
-     * @param {type} camera     : current camera
-     * @param {type} optional   : optional process
-     * @returns {undefined}
-     */
-    BrowseTree.prototype._browse = function(node, camera, optional) {
-        
-        if (this.processNode(node, camera, optional))
-            for (var i = 0; i < node.children.length; i++)
-                this._browse(node.children[i], camera, optional);
-        else
-            this._clean(node, node.level + 2, camera);
-
-    };
-
-    BrowseTree.prototype._clean = function(node, level, camera) {
-        if (node.children.length === 0)
-            return true;
-
-        var childrenCleaned = 0;
+    // recursively clean children
+    if (node.children.length > 0) {
+        var disposableChildrenCount = 0;
         for (var i = 0; i < node.children.length; i++) {
-            var child = node.children[i];
-            // TODO node.wait === true ---> delete child and switch to node.wait = false
-            if (this._clean(child, level, camera) && ((child.level >= level && child.children.length === 0 && !this.nodeProcess.SSE(child, camera) && !node.wait) || node.level === 2))
-                childrenCleaned++;
-        }
-
-        if (childrenCleaned === node.children.length) {
-            node.disposeChildren();
-            return true;
-        } else
-            return false;
-
-    };
-    
-    BrowseTree.prototype.updateNodeMaterial = function(WMTSProvider){
-        
-        var loader = new THREE.TextureLoader();
-        loader.crossOrigin = '';
-        
-        for(var a = 0; a< this.tree.children.length; ++a ){
-            var root = this.tree.children[a];
-            for (var c = 0; c < root.children.length; c++) {
-
-               var node = root.children[c];
-
-               var lookMaterial = function(obj) {
-                   // if (obj.material.Textures_01 ){//&& !obj.visible){
-                         for (var i=0; i< obj.material.Textures_01.length; ++i){
-
-                              var url = obj.material.Textures_01[i].url; 
-                              var x,y,z,urlWMTS;
-                              if(url){
-                                 if(url.indexOf("geoportail")>0){
-                                    var indexTILEMATRIX = url.indexOf("TILEMATRIX=");
-                                    var indexTILEROW    = url.indexOf("&TILEROW=");
-                                    var indexTILECOL    = url.indexOf("&TILECOL=");
-                                    z = url.substring(indexTILEMATRIX + 11,indexTILEROW);
-                                    x = url.substring(indexTILEROW + 9,indexTILECOL);
-                                    y = url.substring(indexTILECOL + 9);
-                                    urlWMTS = "http://a.basemaps.cartocdn.com/dark_all/"+z+"/"+y+"/"+x+".png";
-                                }else{
-                                    var urlArray = url.split("/");
-                                    z = urlArray[4];
-                                    x = urlArray[5];
-                                    y = urlArray[6].split(".")[0];
-                                    var coWMTS = {zoom:z, row:y, col:x};
-                                    urlWMTS = WMTSProvider.urlOrtho(coWMTS);
-                                }
-                                if( url.indexOf(WMTSProvider.baseUrl) <0){  // We need to update texture
-                                    var newTexture = loader.load(urlWMTS);
-                                        newTexture.url = urlWMTS;
-                                        obj.material.Textures_01[i] = newTexture;
-                                }
-                             }
-                         }
-                }.bind(this);
-                node.traverse(lookMaterial);
+            if (this._clean(node.children[i], level, process, camera)) {
+                disposableChildrenCount++;
             }
         }
-    };
 
-    BrowseTree.prototype.updateLayer = function(layer,camera) {
+        // sse means we need to subdivide -> don't try to clean
+        if (disposableChildrenCount === node.children.length && !sse) {
+            // remove children and update visibility
+            node.disposeChildren();
+            node.setDisplayed(node.isVisible());
+        } else {
+            return false;
+        }
+    }
 
-        var root = layer.children[0];
+    var cleanable =
+        (node.level >= level) &&
+        !sse;
+
+    return cleanable;
+};
+
+/*
+ * @documentation: Recursive traverse tree to update a material specific uniform
+ * @returns {undefined}
+ */
+BrowseTree.prototype.updateMaterialUniform = function(uniformName, value) {
+
+
+    for (var a = 0; a < this.tree.children.length; ++a) {
+        var root = this.tree.children[a];
         for (var c = 0; c < root.children.length; c++) {
+
             var node = root.children[c];
+            var lookMaterial = function(obj) {
 
-            this.cachedRTC = this.gfxEngine.getRTCMatrixFromNode(node, camera);                        
-
-            var cRTC = function(obj) {
-                if (obj.material && obj.material.setMatrixRTC)
-                    obj.material.setMatrixRTC(this.cachedRTC);
-
+                obj.material.uniforms[uniformName].value = value;
             }.bind(this);
 
-            node.traverse(cRTC);
-        }
-    };
+            if (node.traverse)
+                node.traverse(lookMaterial);
 
-    return BrowseTree;
-});
+
+        }
+    }
+};
+
+BrowseTree.prototype.updateLayer = function(layer, camera) {
+
+    if (!layer.visible)
+        return;
+
+    var root = layer.children[0];
+
+    for (var c = 0; c < root.children.length; c++) {
+        var node = root.children[c];
+
+        var cRTC = function() {
+
+            var mRTC = this.gfxEngine.getRTCMatrixFromNode(node, camera);
+
+            return function(obj) {
+
+                if (obj.setMatrixRTC)
+                    obj.setMatrixRTC(mRTC);
+
+            };
+
+        }.bind(this)();
+
+        node.traverse(cRTC);
+    }
+};
+
+BrowseTree.prototype.updateMobileMappingLayer = function(layer, camera) {
+
+    if (!layer.visible)
+        return;
+
+    var root = layer.children[0];
+
+    for (var c = 0; c < root.children.length; c++) {
+
+        var node = root.children[c];
+        node.setMatrixRTC(this.gfxEngine.getRTCMatrixFromCenter(node.absoluteCenter, camera));
+
+    }
+};
+
+export default BrowseTree;

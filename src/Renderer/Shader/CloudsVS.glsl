@@ -13,19 +13,23 @@
 
 #define EPSILON 1e-6
 
-
+uniform vec3  lightPosition;
 varying vec2  vUv;
+varying vec3 vNormal;
+varying vec3 pos;
 vec3 normalES;
 vec3 normalCAMES;
 
-void main() 
-{
-    
-    vUv = uv;
 
+void main()
+{
+
+    vUv = uv;
+    vNormal = normal;
+    pos = position;
     gl_Position = projectionMatrix * modelViewMatrix * vec4( position,  1.0 );
 
-    
+
     #ifdef USE_LOGDEPTHBUF
 
         gl_Position.z = log2(max( EPSILON, gl_Position.w + 1.0 )) * logDepthBufFC;
@@ -41,7 +45,7 @@ void main()
         #endif
 
     #endif
-    
+
 }
 
 

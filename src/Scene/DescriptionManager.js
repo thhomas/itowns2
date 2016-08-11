@@ -14,12 +14,12 @@ function DescriptionManager() {
 /**
  */
 DescriptionManager.prototype.descriptionToContent = function() {
-    //TODO: Implement Me 
+    //TODO: Implement Me
 
 };
 
 
 
-module.exports = {
-    DescriptionManager: DescriptionManager
+export {
+    DescriptionManager
 };

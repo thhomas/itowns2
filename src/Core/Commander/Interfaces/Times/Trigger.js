@@ -17,12 +17,12 @@ function Trigger() {
 /**
  */
 Trigger.prototype.executeChildrenCommand = function() {
-    //TODO: Implement Me 
+    //TODO: Implement Me
 
 };
 
 
 
-module.exports = {
-    Trigger: Trigger
+export {
+    Trigger
 };

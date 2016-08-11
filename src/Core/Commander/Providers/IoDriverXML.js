@@ -1,27 +1,27 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+/* global */
+
+import IoDriver from 'Core/Commander/Providers/IoDriver';
 
 
-define('Core/Commander/Providers/IoDriverXML', ['Core/Commander/Providers/IoDriver', 'when'], function(IoDriver, when) {
+function IoDriverXML() {
+    //Constructor
+    IoDriver.call(this);
 
+}
 
-    function IoDriverXML() {
-        //Constructor
-        IoDriver.call(this);
+IoDriverXML.prototype = Object.create(IoDriver.prototype);
 
-    }
+IoDriverXML.prototype.constructor = IoDriverXML;
 
-    IoDriverXML.prototype = Object.create(IoDriver.prototype);
-
-    IoDriverXML.prototype.constructor = IoDriverXML;
-
-    IoDriverXML.prototype.read = function(url) {
-
-        var deferred = when.defer();
-
+IoDriverXML.prototype.read = function(url) {
+    // We don't use fetch here because there no direct
+    // equivalent to responseType="document"
+    return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
 
         xhr.open("GET", url, true);
@@ -30,24 +30,18 @@ define('Core/Commander/Providers/IoDriverXML', ['Core/Commander/Providers/IoDriv
 
         xhr.crossOrigin = '';
 
-        xhr.onload = function() {
-            deferred.resolve(this.response);
-
+        xhr.onload = () => {
+            if (xhr.status < 200 || xhr.status >= 300) {
+                throw new Error(`Error loading ${url}: status ${xhr.status}`);
+            }
+            resolve(xhr.response);
         };
 
-        xhr.onerror = function() {
-
-            deferred.reject(Error("Error IoDriverXML"));
-
-        };
+        xhr.onerror = () => reject(Error("Error IoDriverXML"));
 
         xhr.send(null);
+    });
 
-        return deferred;
+};
 
-
-    };
-
-    return IoDriverXML;
-
-});
+export default IoDriverXML;

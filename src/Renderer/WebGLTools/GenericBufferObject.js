@@ -14,12 +14,12 @@ function GenericBufferObject() {
 /**
  */
 GenericBufferObject.prototype.computeVertex = function() {
-    //TODO: Implement Me 
+    //TODO: Implement Me
 
 };
 
 
 
-module.exports = {
-    GenericBufferObject: GenericBufferObject
+export {
+    GenericBufferObject
 };

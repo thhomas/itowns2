@@ -3,7 +3,7 @@
  * Class: Timeline
  */
 
-var EventsManager = require('EventsManager');
+import EventsManager from 'EventsManager';
 
 function Timeline() {
     //Constructor
@@ -20,12 +20,12 @@ Timeline.prototype = new EventsManager();
  *
  */
 Timeline.prototype.update = function() {
-    //TODO: Implement Me 
+    //TODO: Implement Me
 
 };
 
 
 
-module.exports = {
-    Timeline: Timeline
+export {
+    Timeline
 };
